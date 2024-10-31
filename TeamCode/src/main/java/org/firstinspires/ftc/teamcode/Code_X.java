@@ -77,8 +77,8 @@ public class Code_X extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor armMotor = null;
     private DcMotor extensionMotor=null;
-    int target = 0;
-    //private CRServo intakeServo =null;
+    private int target = 0;
+    private CRServo intakeServo =null;
     private Servo intakeRotatorServo=null;
 
     @Override
@@ -92,7 +92,7 @@ public class Code_X extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
         extensionMotor = hardwareMap.get(DcMotor.class, "extension_motor");
-        //intakeServo = hardwareMap.get(CRServo.class, "intake_servo");
+        intakeServo = hardwareMap.get(CRServo.class, "intake_servo");
         intakeRotatorServo = hardwareMap.get(Servo.class, "intake_rotator_servo");
 
         // ########################################################################################
@@ -109,7 +109,7 @@ public class Code_X extends LinearOpMode {
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        // intakeServo.setDirection(DcMotor.Direction.REVERSE);
+        intakeServo.setDirection(DcMotor.Direction.REVERSE);
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -202,14 +202,11 @@ public class Code_X extends LinearOpMode {
                 
             }
 
-            /*if (gamepad1.right_trigger > 0) {
-            /   intakeServo.setPower(1);
+            if (gamepad1.right_trigger > 0) {
+                intakeServo.setPower(1);
             } else if (gamepad1.left_trigger>0) {
-                intakeServo.setPower(-1);
-            } else {
-                intakeServo.setPower(0);
+                intakeServo.setPower(-0.5);
             }
-            */
 
             if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
                 extensionPower = -1;
