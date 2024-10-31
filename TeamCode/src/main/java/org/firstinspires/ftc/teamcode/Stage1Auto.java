@@ -32,8 +32,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Stage 1 Auto")
-@Disabled
+@Autonomous(name="Stage 1 Auto", group="Basic Auto")
 public class Stage1Auto extends LinearOpMode {
   RobotHardware robot = new RobotHardware(this);
   robot.strafe(1);
