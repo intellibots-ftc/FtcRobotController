@@ -36,6 +36,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Stage1Auto extends LinearOpMode {
   RobotHardware robot = new RobotHardware(this);
   robot.strafe(1);
-  Thread.sleep(500);
+  Thread.sleep(800);
   robot.resetDrive();
 }
