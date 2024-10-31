@@ -38,7 +38,8 @@ public class Stage1Auto extends LinearOpMode {
   
   @Override
   public void runOpMode(){
-    waitforstart();
+    robot.init();
+    waitForStart();
     robot.strafe(1);
     Thread.sleep(800);
     robot.resetDrive();
