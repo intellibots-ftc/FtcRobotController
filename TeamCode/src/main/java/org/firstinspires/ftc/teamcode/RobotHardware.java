@@ -59,17 +59,16 @@ public class RobotHardware {
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
 
     // Define Motor and Servo objects  (Make them private so they can't be accessed externally)
-    private DcMotor leftDrive   = null;
-    private DcMotor rightDrive  = null;
-    private DcMotor armMotor = null;
-    private Servo   leftHand = null;
-    private Servo   rightHand = null;
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor rightBackDrive = null;
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
-    public static final double MID_SERVO       =  0.5 ;
+    /*public static final double MID_SERVO       =  0.5 ;
     public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
     public static final double ARM_UP_POWER    =  0.45 ;
-    public static final double ARM_DOWN_POWER  = -0.45 ;
+    public static final double ARM_DOWN_POWER  = -0.45 ;*/
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotHardware (LinearOpMode opmode) {
@@ -84,25 +83,25 @@ public class RobotHardware {
      */
     public void init()    {
         // Define and Initialize Motors (note: need to use reference to actual OpMode).
-        leftDrive  = myOpMode.hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_drive");
-        armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm");
+        leftFrontDrive  = myOpMode.hardwareMap.get(DcMotor.class, "left_front_drive");
+        leftBackDrive  = myOpMode.hardwareMap.get(DcMotor.class, "left_back_drive");
+        rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_front_drive");
+        rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_back_drive");
+        //armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
         // leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Define and initialize ALL installed servos.
-        leftHand = myOpMode.hardwareMap.get(Servo.class, "left_hand");
-        rightHand = myOpMode.hardwareMap.get(Servo.class, "right_hand");
-        leftHand.setPosition(MID_SERVO);
-        rightHand.setPosition(MID_SERVO);
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
@@ -115,7 +114,7 @@ public class RobotHardware {
      *
      * @param Drive     Fwd/Rev driving power (-1.0 to 1.0) +ve is forward
      * @param Turn      Right/Left turning power (-1.0 to 1.0) +ve is CW
-     */
+     
     public void driveRobot(double Drive, double Turn) {
         // Combine drive and turn for blended motion.
         double left  = Drive + Turn;
@@ -132,14 +131,14 @@ public class RobotHardware {
         // Use existing function to drive both wheels.
         setDrivePower(left, right);
     }
-
+*/
     /**
      * Pass the requested wheel motor powers to the appropriate hardware drive motors.
      *
      * @param leftWheel     Fwd/Rev driving power (-1.0 to 1.0) +ve is forward
      * @param rightWheel    Fwd/Rev driving power (-1.0 to 1.0) +ve is forward
      */
-    public void setDrivePower(double leftWheel, double rightWheel) {
+    /*public void setDrivePower(double leftWheel, double rightWheel) {
         // Output the values to the motor drives.
         leftDrive.setPower(leftWheel);
         rightDrive.setPower(rightWheel);
@@ -150,6 +149,7 @@ public class RobotHardware {
      *
      * @param power driving power (-1.0 to 1.0)
      */
+    /*
     public void setArmPower(double power) {
         armMotor.setPower(power);
     }
@@ -159,9 +159,25 @@ public class RobotHardware {
      *
      * @param offset
      */
+    /*
     public void setHandPositions(double offset) {
         offset = Range.clip(offset, -0.5, 0.5);
         leftHand.setPosition(MID_SERVO + offset);
         rightHand.setPosition(MID_SERVO - offset);
+    }*/
+
+    public void strafe(double direction) {
+        leftFrontDrive.setPower(direction);
+        leftBackDrive.setPower(-1 * direction);
+        rightFrontDrive.setPower(-1 * direction);
+        rightBackDrive.setPower(direction);
     }
+
+    public void resetDrive(){
+        leftFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        rightBackDrive.setPower(0);
+    }
+    
 }
