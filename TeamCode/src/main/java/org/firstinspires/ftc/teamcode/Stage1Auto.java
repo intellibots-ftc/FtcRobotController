@@ -35,7 +35,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Autonomous(name="Stage 1 Auto", group="Basic Auto")
 public class Stage1Auto extends LinearOpMode {
   RobotHardware robot = new RobotHardware(this);
-  robot.strafe(1);
-  Thread.sleep(800);
-  robot.resetDrive();
+  
+  @Override
+  public void runOpMode(){
+    waitforstart();
+    robot.strafe(1);
+    Thread.sleep(800);
+    robot.resetDrive();
+  }
 }
