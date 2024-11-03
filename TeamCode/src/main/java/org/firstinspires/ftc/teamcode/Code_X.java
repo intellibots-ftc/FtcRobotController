@@ -215,7 +215,7 @@ public class Code_X extends LinearOpMode {
 
             if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
                 extensionPower = -1;
-            } else if (gamepad1.left_bumper) {
+            } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
                 extensionPower = 1;
             } else {
                 extensionPower = 0;
