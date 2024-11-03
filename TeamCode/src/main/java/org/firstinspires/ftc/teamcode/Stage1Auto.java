@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -34,20 +34,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="Stage 1 Auto", group="Basic Auto")
 public class Stage1Auto extends LinearOpMode {
-  RobotHardware robot = new RobotHardware(this);
-  
-  @Override
-  public void runOpMode(){
-    robot.init();
-    waitForStart();
-    robot.strafe(1);
-    ElapsedTime timer = new ElapsedTime();
-    timer.reset();
-    
-    // Wait for 0.8 seconds
-    while (timer.seconds() < 0.8) {
-        // Do nothing, just wait
+    AutoDriver robot = new AutoDriver(this);
+
+    @Override
+    public void runOpMode(){
+        robot.init();
+        waitForStart();
+        robot.strafe(1);
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        // Wait for 0.8 seconds
+        while (timer.seconds() < 0.8) {
+            // Do nothing, just wait
+        }
+        robot.resetDrive();
     }
-    robot.resetDrive();
-  }
 }
