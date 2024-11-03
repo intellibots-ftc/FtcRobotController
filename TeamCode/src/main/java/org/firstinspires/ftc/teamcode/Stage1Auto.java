@@ -45,7 +45,7 @@ public class Stage1Auto extends LinearOpMode {
     timer.reset();
     
     // Wait for 0.8 seconds
-    while (timer.seconds() < 0.8 && opModeIsActive()) {
+    while (timer.seconds() < 0.8) {
         // Do nothing, just wait
     }
     robot.resetDrive();
