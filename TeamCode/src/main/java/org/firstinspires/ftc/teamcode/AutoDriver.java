@@ -1,11 +1,9 @@
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
-public class RobotHardware {
+public class AutoDriver {
 
     /* Declare OpMode members. */
     private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
@@ -23,7 +21,7 @@ public class RobotHardware {
     public static final double ARM_DOWN_POWER  = -0.45 ;*/
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
-    public RobotHardware (LinearOpMode opmode) {
+    public AutoDriver (LinearOpMode opmode) {
         myOpMode = opmode;
     }
 
@@ -100,5 +98,5 @@ public class RobotHardware {
         rightFrontDrive.setPower(0);
         rightBackDrive.setPower(0);
     }
-    
+
 }
