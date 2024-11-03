@@ -36,8 +36,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -79,6 +79,8 @@ public class Code_X extends LinearOpMode {
     private DcMotor armMotor = null;
     private DcMotor extensionMotor=null;
     private int target = 0;
+    private double mod = 1;
+    private double slow = 1;
     private CRServo intakeServo =null;
     private Servo intakeRotatorServo=null;
 
@@ -93,8 +95,8 @@ public class Code_X extends LinearOpMode {
         rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
         armMotor = hardwareMap.get(DcMotor.class, "arm_motor");
         extensionMotor = hardwareMap.get(DcMotor.class, "extension_motor");
-        intakeServo = hardwareMap.get(CRServo.class, "intake_servo");
         intakeRotatorServo = hardwareMap.get(Servo.class, "intake_rotator_servo");
+        intakeServo = hardwareMap.get(CRServo.class, "intake_servo");
 
         // ########################################################################################
         // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
@@ -146,14 +148,13 @@ public class Code_X extends LinearOpMode {
             }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double mod = 1;
+            // Set up a variable for each drive wheel to save the power level for telemetry
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
-            double armPower = 0;
-            double extensionPower = 0;
+            float armPower = 0;
+            float extensionPower = 0;
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -168,9 +169,18 @@ public class Code_X extends LinearOpMode {
                 rightBackPower  /= max;
             }
 
-            if (gamepad1.right_stick_button) {
-                mod = 0.2;
+            if (gamepad1.right_stick_button && mod == 1) {
+                slow = 0.2;
             }
+
+            if (gamepad1.right_stick_button && mod == 0.2){
+                slow = 1;
+            }
+
+            if (!gamepad1.right_stick_button){
+                mod = slow;
+            }
+
 
             // This is test code:
             //
@@ -203,20 +213,22 @@ public class Code_X extends LinearOpMode {
             } else {
                 armPower = 0;
                 armMotor.setTargetPosition(target);
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION)
-                
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             }
 
             if (gamepad1.right_trigger > 0) {
                 intakeServo.setPower(1);
             } else if (gamepad1.left_trigger>0) {
                 intakeServo.setPower(-0.5);
+            } else if (gamepad1.left_stick_button) {
+                intakeServo.setPower(0);
             }
 
             if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
-                extensionPower = -1;
+                extensionPower = Math.max(-1,(-5750-extensionMotor.getCurrentPosition())/200);
             } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
-                extensionPower = 1;
+                extensionPower = Math.min(1,(-extensionMotor.getCurrentPosition())/200);
             } else {
                 extensionPower = 0;
             }
@@ -241,6 +253,10 @@ public class Code_X extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Extension motor position", extensionMotor.getCurrentPosition());
             telemetry.addData("Arm motor position",armMotor.getCurrentPosition());
+            telemetry.addData("intake rotator servo pos",intakeRotatorServo.getPosition());
+            telemetry.addData("intake power",intakeServo.getPower());
+            telemetry.addData("mod",mod);
+            telemetry.addData("slow",slow);
             telemetry.update();
         }
     }}
