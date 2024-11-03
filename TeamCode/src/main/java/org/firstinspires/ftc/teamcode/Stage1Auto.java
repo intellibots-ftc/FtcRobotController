@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import java.io.*;  
-import java.lang.Thread;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -43,7 +41,13 @@ public class Stage1Auto extends LinearOpMode {
     robot.init();
     waitForStart();
     robot.strafe(1);
-    Thread.sleep(800);
+    ElapsedTime timer = new ElapsedTime();
+    timer.reset();
+    
+    // Wait for 0.8 seconds
+    while (timer.seconds() < 0.8 && opModeIsActive()) {
+        // Do nothing, just wait
+    }
     robot.resetDrive();
   }
 }
