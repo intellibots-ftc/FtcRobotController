@@ -13,12 +13,17 @@ public class AutoDriver {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor armMotor = null;
+
+    private Servo intakeRotatorServo = null;
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
     /*public static final double MID_SERVO       =  0.5 ;
     public static final double HAND_SPEED      =  0.02 ;  // sets rate to move servo
     public static final double ARM_UP_POWER    =  0.45 ;
     public static final double ARM_DOWN_POWER  = -0.45 ;*/
+
+    public static final double ARM_HANG_POS = -1000
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public AutoDriver (LinearOpMode opmode) {
@@ -37,7 +42,8 @@ public class AutoDriver {
         leftBackDrive  = myOpMode.hardwareMap.get(DcMotor.class, "left_back_drive");
         rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_back_drive");
-        //armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm");
+        armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm_motor");
+        intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -90,6 +96,17 @@ public class AutoDriver {
         leftBackDrive.setPower(direction);
         rightFrontDrive.setPower(direction);
         rightBackDrive.setPower(0);
+    }
+
+    public void hang(){
+        armMotor.setTargetPosition(ARM_HANG_POS);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (armMotor.isBusy()){
+            
+        }
+        drive(1)
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setPower(-1)
     }
 
     public void resetDrive(){
