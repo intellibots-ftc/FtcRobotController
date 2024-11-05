@@ -16,6 +16,7 @@ public class Code_X extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
+    AutoDriver robot = new AutoDriver(this);
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
@@ -56,6 +57,7 @@ public class Code_X extends LinearOpMode {
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (driver presses START)
+        robot.init();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -152,6 +154,10 @@ public class Code_X extends LinearOpMode {
                 intakeRotatorServo.setPosition(0.8333);
             } else {
                 intakeRotatorServo.setPosition(0.5);
+            }
+
+            if (gamepad1.dpad_up) {
+                robot.basketNoMotor();
             }
 
             leftFrontDrive.setPower(leftFrontPower * mod);
