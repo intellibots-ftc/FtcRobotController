@@ -16,6 +16,7 @@ public class AutoDriver {
     private DcMotor armMotor = null;
 
     private Servo intakeRotatorServo = null;
+    private CRServo intakeServo = null;
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
     /*public static final double MID_SERVO       =  0.5 ;
@@ -23,7 +24,9 @@ public class AutoDriver {
     public static final double ARM_UP_POWER    =  0.45 ;
     public static final double ARM_DOWN_POWER  = -0.45 ;*/
 
-    public static final double ARM_HANG_POS = -1000
+    public static final double ARM_HANG_POS = -1000;
+    public static final double ARM_HIGH = -1500;
+    public static final double MAX_EXTENSION = -5700;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public AutoDriver (LinearOpMode opmode) {
@@ -43,7 +46,9 @@ public class AutoDriver {
         rightFrontDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_front_drive");
         rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_back_drive");
         armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm_motor");
+        extensionMotor   = myOpMode.hardwareMap.get(DcMotor.class, "extension_motor");
         intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
+        intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servo");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -98,15 +103,25 @@ public class AutoDriver {
         rightBackDrive.setPower(0);
     }
 
-    public void hang(){
+    public void hangNoMotor(){
         armMotor.setTargetPosition(ARM_HANG_POS);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (armMotor.isBusy()){
             
         }
-        drive(1)
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setPower(-1)
+        armMotor.setPower(-1);
+    }
+
+    public void basketNoMotor(){
+        armMotor.setTargetPosition(ARM_HIGH);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extensionMotor.setTargetPosition(MAX_EXTENSION);
+        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (armMotor.isBusy() || extensionMotor.isBusy()){
+            
+        }
+        intakeServo.setPower(0.5);
     }
 
     public void resetDrive(){
