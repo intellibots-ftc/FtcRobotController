@@ -24,8 +24,8 @@ public class AutoDriver {
     public static final double ARM_UP_POWER    =  0.45 ;
     public static final double ARM_DOWN_POWER  = -0.45 ;*/
 
-    public static final double ARM_HANG_POS = -1000;
-    public static final double ARM_HIGH = -1500;
+    public static final double ARM_HANG_POS = -2000;
+    public static final double ARM_HIGH = -3500;
     public static final double MAX_EXTENSION = -5700;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
