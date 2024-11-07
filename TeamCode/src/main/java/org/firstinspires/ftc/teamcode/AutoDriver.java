@@ -110,16 +110,22 @@ public class AutoDriver {
             
         }
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setPower(-1);
+        armMotor.setPower(1);
     }
 
     public void basketNoMotor(){
-        armMotor.setTargetPosition(ARM_HIGH);
-        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        extensionMotor.setTargetPosition(MAX_EXTENSION);
-        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (armMotor.isBusy() || extensionMotor.isBusy()){
-            
+        int check = (armMotor.getCurrentPosition() > ARM_HIGH) ? -1:1;
+        armMotor.setPower(check);
+        extensionMotor.setPower(-1);
+        boolean endArm = false;
+        boolean endExt = false;
+        while (!endArm || !endExt){
+            if (Math.abs(armMotor.getCurrentPosition() - ARM_HIGH) < 50){
+                endArm = true;
+            }
+            if (Math.abs(extensionMotor.getCurrentPosition() - MAX_EXTENSION) < 100){
+                endExt = true;
+            }
         }
         intakeServo.setPower(0.5);
     }
