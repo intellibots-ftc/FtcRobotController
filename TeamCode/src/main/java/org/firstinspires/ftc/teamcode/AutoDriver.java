@@ -120,10 +120,12 @@ public class AutoDriver {
         boolean endArm = false;
         boolean endExt = false;
         while (!endArm || !endExt){
-            if (Math.abs(armMotor.getCurrentPosition() - ARM_HIGH) < 50){
+            if (Math.abs(armMotor.getCurrentPosition() - ARM_HIGH && !endArm) < 50){
+                armMotor.setPower(0);
                 endArm = true;
             }
-            if (Math.abs(extensionMotor.getCurrentPosition() - MAX_EXTENSION) < 100){
+            if (Math.abs(extensionMotor.getCurrentPosition() - MAX_EXTENSION) < 100 && !endExt){
+                extensionMotor.setPower(0);
                 endExt = true;
             }
         }
