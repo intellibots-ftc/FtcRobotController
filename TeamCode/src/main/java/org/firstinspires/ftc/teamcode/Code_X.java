@@ -168,7 +168,7 @@ public class Code_X extends LinearOpMode {
 
             if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
                 extensionPower = Math.max(-1,(-5750-extensionMotor.getCurrentPosition())/200);
-                target = Math.max(target, (extensionMotor.getCurrentPosition()-200)/-5)
+                target = Math.min(target, (extensionMotor.getCurrentPosition()-200)/5)
             } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
                 extensionPower = Math.min(1,(-extensionMotor.getCurrentPosition())/200);
             } else {
