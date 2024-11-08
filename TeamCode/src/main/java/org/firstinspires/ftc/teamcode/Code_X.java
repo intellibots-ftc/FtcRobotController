@@ -114,6 +114,29 @@ public class Code_X extends LinearOpMode {
             }
 
             // Send calculated power to wheels
+            if (gamepad1.dpad_up) {
+                int check = (armMotor.getCurrentPosition() > -3500) ? -1:1;
+                boolean endArm = false;
+                boolean endExt = false;
+                armMotor.setPower(check);
+                extensionMotor.setPower(-1);
+                while (!endArm || !endExt){
+                    if (Math.abs(armMotor.getCurrentPosition() - -3500) < 50 || Math.abs(armMotor.getPower() - check)>1){
+                        armPower = 0;
+                        endArm = true;
+                    } else {
+                        armPower = check;
+                    }
+                    if (Math.abs(extensionMotor.getCurrentPosition() - -5700) < 100 || (extensionMotor.getPower()+1)>1){
+                        extensionPower = 0;
+                        endExt = true;
+                    } else {
+                        extensionPower=-1;
+                    }
+                }
+                intakeServo.setPower(0.5);
+            }
+            
             if (gamepad1.b) {
                 armPower = 1;
                 armMotor.setPower(armPower * mod);
@@ -121,6 +144,10 @@ public class Code_X extends LinearOpMode {
                 armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             } else if (gamepad1.y) {
                 armPower = -1;
+                armMotor.setPower(armPower * mod);
+                target = armMotor.getCurrentPosition();
+                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            } else if (armPower != 0){
                 armMotor.setPower(armPower * mod);
                 target = armMotor.getCurrentPosition();
                 armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -141,7 +168,7 @@ public class Code_X extends LinearOpMode {
 
             if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
                 extensionPower = Math.max(-1,(-5750-extensionMotor.getCurrentPosition())/200);
-                target = Math.max(target, (extensionMotor.getCurrentPosition()+200)/-5)
+                target = Math.max(target, (extensionMotor.getCurrentPosition()-200)/-5)
             } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
                 extensionPower = Math.min(1,(-extensionMotor.getCurrentPosition())/200);
             } else {
@@ -154,10 +181,6 @@ public class Code_X extends LinearOpMode {
                 intakeRotatorServo.setPosition(0.8333);
             } else {
                 intakeRotatorServo.setPosition(0.5);
-            }
-
-            if (gamepad1.dpad_up) {
-                robot.basketNoMotor();
             }
 
             leftFrontDrive.setPower(leftFrontPower * mod);
