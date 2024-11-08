@@ -115,18 +115,20 @@ public class AutoDriver {
 
     public void basketNoMotor(){
         int check = (armMotor.getCurrentPosition() > ARM_HIGH) ? -1:1;
-        armMotor.setPower(check);
-        extensionMotor.setPower(-1);
         boolean endArm = false;
         boolean endExt = false;
         while (!endArm || !endExt){
-            if (Math.abs(armMotor.getCurrentPosition() - ARM_HIGH) < 50 && armMotor.getPower() == check){
+            if (Math.abs(armMotor.getCurrentPosition() - ARM_HIGH) < 50 || Math.abs(armMotor.getPower() - check)>1){
                 armMotor.setPower(0);
                 endArm = true;
+            } else {
+                armMotor.setPower(check);
             }
-            if (Math.abs(extensionMotor.getCurrentPosition() - MAX_EXTENSION) < 100 && extensionMotor.getPower()==-1){
+            if (Math.abs(extensionMotor.getCurrentPosition() - MAX_EXTENSION) < 100 || (extensionMotor.getPower()+1)>1){
                 extensionMotor.setPower(0);
                 endExt = true;
+            } else {
+                extensionMotor.setPower(-1);
             }
         }
         intakeServo.setPower(0.5);
