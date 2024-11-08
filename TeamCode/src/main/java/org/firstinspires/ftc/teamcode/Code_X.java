@@ -118,7 +118,7 @@ public class Code_X extends LinearOpMode {
                 armMotor.setTargetPosition(-3500);
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 extensionMotor.setTargetPosition(-5700);
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
             
             if (gamepad1.b) {
