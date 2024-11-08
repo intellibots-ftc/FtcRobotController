@@ -115,8 +115,7 @@ public class Code_X extends LinearOpMode {
 
             // Send calculated power to wheels
             if (gamepad1.dpad_up) {
-                armMotor.setTargetPosition(-5000);
-                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                target = -3500;
                 extensionMotor.setTargetPosition(-5700);
                 extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
