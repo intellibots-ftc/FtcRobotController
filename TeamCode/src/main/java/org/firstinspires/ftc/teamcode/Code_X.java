@@ -149,9 +149,11 @@ public class Code_X extends LinearOpMode {
                 extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 extensionPower = Math.max(-1,(-5750-extensionMotor.getCurrentPosition())/200);
                 target = Math.min(target, (extensionMotor.getCurrentPosition()-2000)/4)
+                extensionMotor.setPower(extensionPower * mod);
             } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
                 extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 extensionPower = Math.min(1,(-extensionMotor.getCurrentPosition())/200);
+                extensionMotor.setPower(extensionPower * mod);
             } else {
                 extensionPower = 0;
             }
@@ -168,7 +170,6 @@ public class Code_X extends LinearOpMode {
             rightFrontDrive.setPower(rightFrontPower * mod);
             leftBackDrive.setPower(leftBackPower * mod);
             rightBackDrive.setPower(rightBackPower * mod);
-            extensionMotor.setPower(extensionPower * mod);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
