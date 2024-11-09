@@ -104,13 +104,25 @@ public class AutoDriver {
     }
 
     public void hangNoMotor(){
+        intakeRotatorServo.setPosition(0.83333);
+        leftFrontDrive.setTargetPosition(6100);
+        leftBackDrive.setTargetPosition(6100);
+        rightFrontDrive.setTargetPosition(6100);
+        rightBackDrive.setTargetPosition(6100);
         armMotor.setTargetPosition(ARM_HANG_POS);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (armMotor.isBusy()){
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (LeftFrontDrive.isBusy()){
             
         }
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setPower(1);
+        leftFrontDrive.setTargetPosition(5000);
+        leftBackDrive.setTargetPosition(5000);
+        rightFrontDrive.setTargetPosition(5000);
+        rightBackDrive.setTargetPosition(5000);
+        armMotor.setTargetPosition(ARM_HANG_POS+500);
     }
 
     public void basketNoMotor(){
