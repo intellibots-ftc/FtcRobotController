@@ -23,11 +23,13 @@ public class Code_X extends LinearOpMode {
     private DcMotor rightBackDrive = null;
     private DcMotor armMotor = null;
     private DcMotor extensionMotor=null;
-    private int target = 0;
-    private double mod = 1;
-    private double slow = 1;
     private CRServo intakeServo =null;
     private Servo intakeRotatorServo=null;
+    private int target = 0;
+    private int extTarget = 0;
+    private double mod = 1;
+    private double slow = 1;
+    private final int MAX_EXTENTION = -5700;
 
     @Override
     public void runOpMode() {
@@ -102,10 +104,10 @@ public class Code_X extends LinearOpMode {
             }
 
             if (gamepad1.right_stick_button && mod == 1) {
-                slow = 0.3;
+                slow = 0.4;
             }
 
-            if (gamepad1.right_stick_button && mod == 0.2){
+            if (gamepad1.right_stick_button && mod == 0.4){
                 slow = 1;
             }
 
@@ -116,8 +118,7 @@ public class Code_X extends LinearOpMode {
             // Send calculated power to wheels
             if (gamepad1.dpad_up) {
                 target = -3700;
-                extensionMotor.setTargetPosition(-5700);
-                extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                extTarget = MAX_EXTENSION;
             }
             
             if (gamepad1.b) {
@@ -147,15 +148,16 @@ public class Code_X extends LinearOpMode {
 
             if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
                 extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                extensionPower = Math.max(-1,(-5750-extensionMotor.getCurrentPosition())/200);
-                target = Math.min(target, (extensionMotor.getCurrentPosition()-2000)/4)
+                extensionPower = Math.max(-1,(MAX_EXTENSION-extensionMotor.getCurrentPosition())/200);
+                target = Math.min(target, (extensionMotor.getCurrentPosition()-3500)/7);
                 extensionMotor.setPower(extensionPower * mod);
             } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
                 extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 extensionPower = Math.min(1,(-extensionMotor.getCurrentPosition())/200);
                 extensionMotor.setPower(extensionPower * mod);
             } else {
-                extensionPower = 0;
+                extensionMotor.setTargetPosition(extTarget);
+                extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
             if (gamepad1.x) {
