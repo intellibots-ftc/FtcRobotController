@@ -98,7 +98,7 @@ public class RobotControl {
         }
     }
 
-    public int armControl(power, target){
+    public void armControl(power){
         if (power != 0){
             int validity = 0;
             if (power > 0 && armMotor.getCurrentPosition() < -50){
@@ -108,18 +108,41 @@ public class RobotControl {
             }
             armMotor.setPower(power * validity);
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            target = armMotor.getCurrentPosition();
+            armTarget = armMotor.getCurrentPosition();
         } else {
-            armMotor.setTargetPosition(target);
+            armMotor.setTargetPosition(armTarget);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-        return target;
     }
 
-    public void update(mod){
+    public void extendControl(power){
+        if (power != 0){
+            int validity = 0;
+            if (power > 0 && extensionMotor.getCurrentPosition() < -50){
+                validity = Math.min(1, extensionMotor.getCurrentPosition()/-200);
+            } else if (power < 0 && extensionMotor.getCurrentPosition() > MAX_EXTENSION){
+                validity = Math.min(1, (extensionMotor.getCurrentPosition() - MAX_EXTENSION)/200);
+            }
+            extensionMotor.setPower(power * validity);
+            extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            extTarget = extensionMotor.getCurrentPosition();
+        } else {
+            extensionMotor.setTargetPosition(extTarget);
+            extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+    }
+
+    public void updateDrive(mod){
         leftFrontDrive.setPower(leftFrontPower * mod);
         rightFrontDrive.setPower(rightFrontPower * mod);
         leftBackDrive.setPower(leftBackPower * mod);
         rightBackDrive.setPower(rightBackPower * mod);
+    }
+
+    public void resetDrive(){
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
     }
 }
