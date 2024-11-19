@@ -17,7 +17,7 @@ public class RobotControl {
     private DcMotor rightBackDrive = null;
     private DcMotor armMotor = null;
     private DcMotor extensionMotor=null;
-    private CRServo intakeServo =null;
+    public CRServo intakeServo =null;
     private Servo intakeRotatorServo=null;
 
     public static final double ARM_HANG_POS = -2000;
@@ -32,7 +32,7 @@ public class RobotControl {
     private int extTarget = 0;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
-    public AutoDriver (LinearOpMode opmode) {
+    public RobotControl (LinearOpMode opmode) {
         myOpMode = opmode;
     }
 
