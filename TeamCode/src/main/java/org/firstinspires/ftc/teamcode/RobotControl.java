@@ -80,6 +80,19 @@ public class RobotControl {
         myOpMode.telemetry.update();
     }
 
+    public void powerDrive(lf, rf, lb, rb){
+        leftFrontPower  = lf;
+        rightFrontPower = rf;
+        leftBackPower   = lb;
+        rightBackPower  = rb;
+    }
+
+    public void defDrive(mode){
+        if (mode == 'forward'){
+            powerDriver(1, 1, 1, 1);
+        }
+    }
+
     public void controllerDrive(axial, lateral, yaw) {
         leftFrontPower  = axial + lateral + yaw;
         rightFrontPower = axial - lateral - yaw;
