@@ -69,6 +69,11 @@ public class Code_Z extends LinearOpMode {
                 robot.armTarget = robot.ARM_HIGH;
                 robot.extTarget = robot.MAX_EXTENSION;
             }
+
+            if (gamepad1.dpad_down) {
+                robot.armTarget = -1500;
+                robot.extTarget = -50;
+            }
             
             if (gamepad1.b) {
                 robot.armControl(mod);
@@ -106,13 +111,13 @@ public class Code_Z extends LinearOpMode {
             robot.updateDrive(mod);
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            /*telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.addData("Extension motor position", extensionMotor.getCurrentPosition());
             telemetry.addData("Arm motor position",armMotor.getCurrentPosition());
             telemetry.addData("intake rotator servo pos",intakeRotatorServo.getPosition());
             telemetry.addData("intake power",intakeServo.getPower());
-            telemetry.update();
+            telemetry.update();*/
         }
     }}
