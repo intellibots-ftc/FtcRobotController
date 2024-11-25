@@ -16,20 +16,20 @@ public class RobotControl {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor armMotor = null;
-    private DcMotor extensionMotor=null;
+    public DcMotor extensionMotor=null;
     public CRServo intakeServo =null;
-    private Servo intakeRotatorServo=null;
+    public Servo intakeRotatorServo=null;
 
     public static final double ARM_HANG_POS = -2000;
-    public static final double ARM_HIGH = -3500;
-    public static final double MAX_EXTENSION = -2050;
+    public static final int ARM_HIGH = -3200;
+    public static final int MAX_EXTENSION = -2050;
 
     private double leftFrontPower  = 0;
     private double rightFrontPower = 0;
     private double leftBackPower   = 0;
     private double rightBackPower  = 0;
-    private int armTarget = 0;
-    private int extTarget = 0;
+    public int armTarget = 0;
+    public int extTarget = 0;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotControl (LinearOpMode opmode) {
@@ -80,25 +80,26 @@ public class RobotControl {
         myOpMode.telemetry.update();
     }
 
-    public void powerDrive(lf, rf, lb, rb){
+    public void powerDrive(double lf, double rf, double lb, double rb){
         leftFrontPower  = lf;
         rightFrontPower = rf;
         leftBackPower   = lb;
         rightBackPower  = rb;
     }
 
-    public void defDrive(mode){
-        if (mode == 'forward'){
-            powerDriver(1, 1, 1, 1);
+    public void defDrive(String mode){
+        if (mode == "forward"){
+            powerDrive(1, 1, 1, 1);
         }
     }
 
-    public void controllerDrive(axial, lateral, yaw) {
+    public void controllerDrive(double axial, double lateral, double yaw) {
         leftFrontPower  = axial + lateral + yaw;
         rightFrontPower = axial - lateral - yaw;
         leftBackPower   = axial - lateral + yaw;
         rightBackPower  = axial + lateral - yaw;
 
+        double max = 0;
         max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
         max = Math.max(max, Math.abs(leftBackPower));
         max = Math.max(max, Math.abs(rightBackPower));
@@ -111,7 +112,7 @@ public class RobotControl {
         }
     }
 
-    public void armControl(power){
+    public void armControl(double power){
         if (power != 0){
             int validity = 0;
             if (power > 0 && armMotor.getCurrentPosition() < -50){
@@ -128,9 +129,9 @@ public class RobotControl {
         }
     }
 
-    public void extendControl(power){
+    public void extendControl(double power){
         if (power != 0){
-            int validity = 0;
+            double validity = 0;
             if (power > 0 && extensionMotor.getCurrentPosition() < -50){
                 validity = Math.min(1, extensionMotor.getCurrentPosition()/-200);
             } else if (power < 0 && extensionMotor.getCurrentPosition() > MAX_EXTENSION){
@@ -145,7 +146,7 @@ public class RobotControl {
         }
     }
 
-    public void updateDrive(mod){
+    public void updateDrive(double mod){
         leftFrontDrive.setPower(leftFrontPower * mod);
         rightFrontDrive.setPower(rightFrontPower * mod);
         leftBackDrive.setPower(leftBackPower * mod);
