@@ -47,7 +47,7 @@ public class Code_Z extends LinearOpMode {
                 lateral=0;
             }
 
-            robot.ControllerDrive(axial, lateral, yaw);
+            robot.controllerDrive(axial, lateral, yaw);
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry
@@ -74,7 +74,7 @@ public class Code_Z extends LinearOpMode {
                 robot.armTarget = -1500;
                 robot.extTarget = -50;
             }
-            
+
             if (gamepad1.b) {
                 robot.armControl(mod);
             } else if (gamepad1.y) {
@@ -89,24 +89,24 @@ public class Code_Z extends LinearOpMode {
             } else if (gamepad1.left_trigger>0) {
                 robot.intakeServo.setPower(-0.5);
             } else if (gamepad1.left_stick_button) {
-                intakeServo.setPower(0);
+                robot.intakeServo.setPower(0);
             }
 
-            if (gamepad1.right_bumper && extensionMotor.getCurrentPosition() > -5750) {
+            if (gamepad1.right_bumper && robot.extensionMotor.getCurrentPosition() > robot.MAX_EXTENSION) {
                 robot.extendControl(-mod);
-            } else if (gamepad1.left_bumper && extensionMotor.getCurrentPosition() < -50) {
+            } else if (gamepad1.left_bumper && robot.extensionMotor.getCurrentPosition() < -50) {
                 robot.extendControl(mod);
             } else {
                 robot.extendControl(0);
             }
 
-            /*if (gamepad1.x) {
-                intakeRotatorServo.setPosition(0.1666);
+            if (gamepad1.x) {
+                robot.intakeRotatorServo.setPosition(0.1666);
             } else if (gamepad1.a) {
-                intakeRotatorServo.setPosition(0.8333);
+                robot.intakeRotatorServo.setPosition(0.8333);
             } else {
-                intakeRotatorServo.setPosition(0.5);
-            }*/
+                robot.intakeRotatorServo.setPosition(0.5);
+            }
 
             robot.updateDrive(mod);
 
