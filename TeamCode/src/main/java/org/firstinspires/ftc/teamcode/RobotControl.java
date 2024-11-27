@@ -20,8 +20,8 @@ public class RobotControl {
     public CRServo intakeServo =null;
     public Servo intakeRotatorServo=null;
 
-    public static final double ARM_HANG_POS = -2000;
-    public static final int ARM_HIGH = -3200;
+    public static final double ARM_HANG_POS = -1500;
+    public static final int ARM_HIGH = -2800;
     public static final int MAX_EXTENSION = -2000;
 
     private double leftFrontPower  = 0;
@@ -75,6 +75,7 @@ public class RobotControl {
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
@@ -124,6 +125,7 @@ public class RobotControl {
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armTarget = armMotor.getCurrentPosition();
         } else {
+            armMotor.setPower(1);
             armMotor.setTargetPosition(armTarget);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
@@ -141,6 +143,7 @@ public class RobotControl {
             extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extTarget = extensionMotor.getCurrentPosition();
         } else {
+            extensionMotor.setPower(1);
             extensionMotor.setTargetPosition(extTarget);
             extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
