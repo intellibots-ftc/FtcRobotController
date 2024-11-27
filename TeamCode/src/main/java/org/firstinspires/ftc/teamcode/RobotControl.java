@@ -15,7 +15,7 @@ public class RobotControl {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
-    private DcMotor armMotor = null;
+    public DcMotor armMotor = null;
     public DcMotor extensionMotor=null;
     public CRServo intakeServo =null;
     public Servo intakeRotatorServo=null;
