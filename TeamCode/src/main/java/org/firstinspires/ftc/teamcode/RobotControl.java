@@ -22,7 +22,7 @@ public class RobotControl {
 
     public static final double ARM_HANG_POS = -2000;
     public static final int ARM_HIGH = -3200;
-    public static final int MAX_EXTENSION = -2050;
+    public static final int MAX_EXTENSION = -2000;
 
     private double leftFrontPower  = 0;
     private double rightFrontPower = 0;
@@ -114,12 +114,12 @@ public class RobotControl {
 
     public void armControl(double power){
         if (power != 0){
-            int validity = 0;
+            /*int validity = 0;
             if (power > 0 && armMotor.getCurrentPosition() < -50){
                 validity = 1;
             } else if (power < 0 && armMotor.getCurrentPosition() > ARM_HIGH){
                 validity = 1;
-            }
+            }*/
             armMotor.setPower(power * validity);
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armTarget = armMotor.getCurrentPosition();
@@ -133,9 +133,9 @@ public class RobotControl {
         if (power != 0){
             double validity = 0;
             if (power > 0 && extensionMotor.getCurrentPosition() < -50){
-                validity = Math.min(1, extensionMotor.getCurrentPosition()/-200);
+                validity = Math.min(1, extensionMotor.getCurrentPosition()/-400);
             } else if (power < 0 && extensionMotor.getCurrentPosition() > MAX_EXTENSION){
-                validity = Math.min(1, (extensionMotor.getCurrentPosition() - MAX_EXTENSION)/200);
+                validity = Math.min(1, (extensionMotor.getCurrentPosition() - MAX_EXTENSION)/400);
             }
             extensionMotor.setPower(power * validity);
             extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
