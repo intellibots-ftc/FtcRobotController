@@ -111,13 +111,15 @@ public class Code_Z extends LinearOpMode {
             robot.updateDrive(mod);
 
             // Show the elapsed game time and wheel power.
-            /*telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Extension motor position", extensionMotor.getCurrentPosition());
-            telemetry.addData("Arm motor position",armMotor.getCurrentPosition());
-            telemetry.addData("intake rotator servo pos",intakeRotatorServo.getPosition());
-            telemetry.addData("intake power",intakeServo.getPower());
-            telemetry.update();*/
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            /*telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);*/
+            telemetry.addData("Extension motor position", robot.extensionMotor.getCurrentPosition());
+            telemetry.addData("Extension motor target", robot.extTarget);
+            telemetry.addData("Arm motor position", robot.armMotor.getCurrentPosition());
+            telemetry.addData("Arm motor target", robot.armTarget);
+            /*telemetry.addData("intake rotator servo pos",intakeRotatorServo.getPosition());
+            telemetry.addData("intake power",intakeServo.getPower());*/
+            telemetry.update();
         }
     }}
