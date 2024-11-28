@@ -75,6 +75,10 @@ public class Code_Z extends LinearOpMode {
                 robot.extTarget = -50;
             }
 
+            if (gamepad1.dpad_left){
+                robot.DriveToPosition();
+            }
+
             if (gamepad1.b) {
                 robot.armControl(mod);
             } else if (gamepad1.y) {
