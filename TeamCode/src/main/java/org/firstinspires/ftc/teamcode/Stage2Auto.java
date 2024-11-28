@@ -22,7 +22,7 @@ public class Stage2Auto extends LinearOpMode {
         robot.positionServo();
 
         // Wait for 0.8 seconds
-        while (timer.seconds() < 3) {
+        while (timer.seconds() < 3.15) {
             // Do nothing, just wait
         }
         robot.resetDrive();
