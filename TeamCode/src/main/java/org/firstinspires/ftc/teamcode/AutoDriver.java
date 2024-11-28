@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -16,9 +18,9 @@ public class AutoDriver {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotor armMotor = null;
-
+    private DcMotor extensionMotor = null;
     private Servo intakeRotatorServo = null;
-    private CRServo intakeServo = null;
+    public CRServo intakeServo = null;
 
     // Define Drive constants.  Make them public so they CAN be used by the calling OpMode
     /*public static final double MID_SERVO       =  0.5 ;
@@ -49,8 +51,9 @@ public class AutoDriver {
         rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_back_drive");
         armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm_motor");
         extensionMotor   = myOpMode.hardwareMap.get(DcMotor.class, "extension_motor");
-        intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
+        //
         intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servo");
+        intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -105,7 +108,7 @@ public class AutoDriver {
         rightBackDrive.setPower(0);
     }
 
-    public void hangNoMotor(){
+    /*public void hangNoMotor(){
         intakeRotatorServo.setPosition(0.83333);
         leftFrontDrive.setTargetPosition(6100);
         leftBackDrive.setTargetPosition(6100);
@@ -118,20 +121,35 @@ public class AutoDriver {
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (LeftFrontDrive.isBusy()){
-            
+
         }
         leftFrontDrive.setTargetPosition(5000);
         leftBackDrive.setTargetPosition(5000);
         rightFrontDrive.setTargetPosition(5000);
         rightBackDrive.setTargetPosition(5000);
         armMotor.setTargetPosition(ARM_HANG_POS+500);
-    }
+    }*/
 
     public void basketNoMotor(){
         armMotor.setTargetPosition(-2800);
         extensionMotor.setTargetPosition(-2000);
+        armMotor.setPower(1);
+        extensionMotor.setPower(1);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void basketUndo(){
+        armMotor.setTargetPosition(-1200);
+        extensionMotor.setTargetPosition(-50);
+        armMotor.setPower(1);
+        extensionMotor.setPower(1);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void runServo(double dir){
+        intakeServo.setPower(dir);
     }
 
     public void resetDrive(){
