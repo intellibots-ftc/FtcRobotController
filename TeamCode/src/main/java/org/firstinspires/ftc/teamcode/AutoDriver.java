@@ -152,6 +152,10 @@ public class AutoDriver {
         intakeServo.setPower(dir);
     }
 
+    public void positionServo(){
+        intakeRotatorServo.setPosition(0.5);
+    }
+
     public void resetDrive(){
         leftFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
