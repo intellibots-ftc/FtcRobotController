@@ -19,6 +19,7 @@ public class Stage2Auto extends LinearOpMode {
         robot.drive(0.2);
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
+        robot.positionServo();
 
         // Wait for 0.8 seconds
         while (timer.seconds() < 3) {
@@ -30,17 +31,13 @@ public class Stage2Auto extends LinearOpMode {
         while (timer.seconds()<3){
 
         }
-        robot.strafe(0.5);
-        while (timer.seconds()<3.2){
-            
-        }
         robot.drive(-0.4);
-        while (timer.seconds() < 4){
+        while (timer.seconds() < 5){
 
         }
         robot.basketUndo();
         timer.reset();
-        while(timer.seconds()<2.5){
+        while(timer.seconds()<2){
 
         }
     }
