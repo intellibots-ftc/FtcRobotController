@@ -23,6 +23,7 @@ public class RobotControl {
     public static final double ARM_HANG_POS = -1500;
     public static final int ARM_HIGH = -2800;
     public static final int MAX_EXTENSION = -2000;
+    public static final double TICKS_PER_DEGREE = 10;
 
     private double leftFrontPower  = 0;
     private double rightFrontPower = 0;
@@ -82,6 +83,11 @@ public class RobotControl {
     }
 
     public void powerDrive(double lf, double rf, double lb, double rb){
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
         leftFrontPower  = lf;
         rightFrontPower = rf;
         leftBackPower   = lb;
@@ -115,7 +121,7 @@ public class RobotControl {
 
     public void armControl(double power){
         if (power != 0){
-            /*int validity = 0;
+            int validity = 1; /*
             if (power > 0 && armMotor.getCurrentPosition() < -50){
                 validity = 1;
             } else if (power < 0 && armMotor.getCurrentPosition() > ARM_HIGH){
@@ -149,7 +155,42 @@ public class RobotControl {
         }
     }
 
+    public void rotate (double start, double end){
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + Math.round((end - start) * TICKS_PER_DEGREE));
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + Math.round((start - end) * TICKS_PER_DEGREE));
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round((end - start) * TICKS_PER_DEGREE));
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round((start - end) * TICKS_PER_DEGREE));
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void DriveToTarget(double posx, double posy, double rot, double tarx, double tary){
+        double sidex = tarx - posx;
+        double sidey = tary - posy;
+        rotate(rot, Math.toDegrees(Math.atan(sidey / sidex)));
+        int hyp = Math.round(Math.hypot(sidex, sidey));
+
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + hyp);
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + hyp);
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + hyp);
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + hyp);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        
+    }
+
     public void updateDrive(double mod){
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
         leftFrontDrive.setPower(leftFrontPower * mod);
         rightFrontDrive.setPower(rightFrontPower * mod);
         leftBackDrive.setPower(leftBackPower * mod);
@@ -157,6 +198,11 @@ public class RobotControl {
     }
 
     public void resetDrive(){
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
