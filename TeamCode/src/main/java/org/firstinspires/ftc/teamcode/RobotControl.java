@@ -172,10 +172,9 @@ public class RobotControl {
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void DriveToTarget(double posx, double posy, double rot, double tarx, double tary, double power){
+    public void DriveToTarget(double posx, double posy, double tarx, double tary, double power){
         double sidex = tarx - posx;
         double sidey = tary - posy;
-        rotate(rot, Math.toDegrees(Math.atan(sidey / sidex)));
         int hyp = Math.round(Math.hypot(sidex, sidey));
 
         leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + hyp);
