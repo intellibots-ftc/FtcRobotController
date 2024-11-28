@@ -161,13 +161,18 @@ public class RobotControl {
         leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round((end - start) * TICKS_PER_DEGREE));
         rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round((start - end) * TICKS_PER_DEGREE));
 
+        leftFrontDrive.setPower(1);
+        rightFrontDrive.setPower(1);
+        leftBackDrive.setPower(1);
+        rightBackDrive.setPower(1);
+        
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void DriveToTarget(double posx, double posy, double rot, double tarx, double tary){
+    public void DriveToTarget(double posx, double posy, double rot, double tarx, double tary, double power){
         double sidex = tarx - posx;
         double sidey = tary - posy;
         rotate(rot, Math.toDegrees(Math.atan(sidey / sidex)));
@@ -177,6 +182,11 @@ public class RobotControl {
         rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + hyp);
         leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + hyp);
         rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + hyp);
+
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(power);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
