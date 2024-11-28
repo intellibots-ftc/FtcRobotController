@@ -15,6 +15,16 @@ public class Stage1Auto extends LinearOpMode {
     public void runOpMode(){
         robot.init();
         waitForStart();
-        robot.hangNoMotor();
+        robot.basketNoMotor();
+        robot.drive(0.2);
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+
+        // Wait for 0.8 seconds
+        while (timer.seconds() < 0.8) {
+            // Do nothing, just wait
+        }
+        robot.resetDrive();
+        robot.intakeServo.setPower(1);
     }
 }
