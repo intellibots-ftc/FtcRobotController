@@ -76,8 +76,8 @@ public class Code_Z extends LinearOpMode {
             }
 
             if (gamepad1.dpad_left){
-                double curx, cury, tarx, tary
-                robot.DriveToTarget(curx, cury, tarx, tary);
+                double curx, cury
+                robot.DriveToTarget(curx, cury, 0, 0);
             }
 
             if (gamepad1.b) {
