@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@Autonomous(name="Stage 1 Auto", group="Basic Auto")
-public class Stage1Auto extends LinearOpMode {
+@Autonomous(name="Stage 2 Auto", group="Basic Auto")
+public class Stage2Auto extends LinearOpMode {
     AutoDriver robot = new AutoDriver(this);
 
     @Override
@@ -21,10 +21,27 @@ public class Stage1Auto extends LinearOpMode {
         timer.reset();
 
         // Wait for 0.8 seconds
-        while (timer.seconds() < 0.8) {
+        while (timer.seconds() < 3) {
             // Do nothing, just wait
         }
         robot.resetDrive();
-        robot.intakeServo.setPower(1);
+        robot.runServo(1);
+        timer.reset();
+        while (timer.seconds()<3){
+
+        }
+        robot.strafe(0.5);
+        while (timer.seconds()<3.2){
+            
+        }
+        robot.drive(-0.4);
+        while (timer.seconds() < 4){
+
+        }
+        robot.basketUndo();
+        timer.reset();
+        while(timer.seconds()<2.5){
+
+        }
     }
 }
