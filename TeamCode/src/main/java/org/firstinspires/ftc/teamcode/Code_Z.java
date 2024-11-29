@@ -91,8 +91,8 @@ public class Code_Z extends LinearOpMode {
             }
 
             if (gamepad1.dpad_left){
-                robot.rotate(0);
-                robot.DriveToTarget(0, 0);
+                robot.rotate(0, 0.1);
+                robot.DriveToTarget(0, 0, 0.1);
             }
 
             if (gamepad1.b) {
