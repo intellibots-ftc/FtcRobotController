@@ -34,8 +34,9 @@ public class RobotControl {
     public static final double BASKET_Y_AUTO = 0;
     public static final double BASKET_X_TELE = 0;
     public static final double BASKET_Y_TELE = 0;
-
+    
     private double leftFrontPower  = 0;
+    public controlOn = 1;
     private double rightFrontPower = 0;
     private double leftBackPower   = 0;
     private double rightBackPower  = 0;
@@ -213,6 +214,7 @@ public class RobotControl {
     }
 
     public void DriveToTarget(double tarx, double tary, double power){
+        controlOn = 0;
         odo.update();
         Pose2D pos = odo.getPosition();
         double posx = pos.getX(DistanceUnit.MM);
