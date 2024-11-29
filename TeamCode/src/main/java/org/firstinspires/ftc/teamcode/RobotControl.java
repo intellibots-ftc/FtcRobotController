@@ -198,6 +198,13 @@ public class RobotControl {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int i = 0;
+        while (Math.abs(leftFrontDrive.getCurrentPosition()-leftFrontDrive.getTargetPosition()) > TICKS_PER_DEGREE && i == 0) {
+            if (myOpMode.gamepad1.dpad_left){
+                i = 1;
+            }
+        }
     }
 
     public void DriveToTarget(double tarx, double tary, double power){
