@@ -140,6 +140,11 @@ public class RobotControl {
         rightFrontPower *= mod;
         leftBackPower *= mod;
         rightBackPower *= mod;
+
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
     }
 
     public void armControl(double power){
@@ -233,13 +238,6 @@ public class RobotControl {
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         
-    }
-
-    public void updateDrive(){
-        leftFrontDrive.setPower(leftFrontPower);
-        rightFrontDrive.setPower(rightFrontPower);
-        leftBackDrive.setPower(leftBackPower);
-        rightBackDrive.setPower(rightBackPower);
     }
 
     public void resetDrive(){
