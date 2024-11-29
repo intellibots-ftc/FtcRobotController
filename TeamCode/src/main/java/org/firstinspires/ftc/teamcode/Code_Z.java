@@ -10,6 +10,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.CRServo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
 
 @TeleOp(name="Final code", group="Linear OpMode")
 public class Code_Z extends LinearOpMode {
@@ -19,6 +23,9 @@ public class Code_Z extends LinearOpMode {
     RobotControl robot = new RobotControl(this);
     private double mod = 1;
     private double slow = 1;
+    
+    GoBildaPinpointDriver odo;
+
     @Override
     public void runOpMode() {
 
@@ -26,6 +33,12 @@ public class Code_Z extends LinearOpMode {
         robot.init();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+        odo.setOffsets(8.0, -168.0);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        odo.resetPosAndIMU();
 
         waitForStart();
         runtime.reset();
@@ -118,6 +131,10 @@ public class Code_Z extends LinearOpMode {
             if (axial > 0 || lateral > 0 || yaw > 0){
                 robot.updateDrive();
             }
+
+            Pose2D pos = odo.getPosition();
+            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+            telemetry.addData("odo Position", data);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
