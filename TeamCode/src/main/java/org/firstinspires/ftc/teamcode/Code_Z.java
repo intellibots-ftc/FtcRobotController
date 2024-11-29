@@ -60,9 +60,7 @@ public class Code_Z extends LinearOpMode {
                 lateral=0;
             }
 
-            if (axial > 0 || lateral > 0 || yaw > 0){
-                robot.controllerDrive(axial, lateral, yaw, mod);
-            }
+            robot.controllerDrive(axial, lateral, yaw, mod);
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry
