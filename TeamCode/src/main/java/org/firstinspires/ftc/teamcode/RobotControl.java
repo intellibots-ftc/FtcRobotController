@@ -189,10 +189,10 @@ public class RobotControl {
         leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
         rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
 
-        leftFrontDrive.setPower(power);
-        rightFrontDrive.setPower(power);
-        leftBackDrive.setPower(power);
-        rightBackDrive.setPower(power);
+        leftFrontPower = power;
+        leftBackPower = power;
+        rightFrontPower = power;
+        rightBackPower = power;
         
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -236,11 +236,6 @@ public class RobotControl {
     }
 
     public void updateDrive(){
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
