@@ -100,7 +100,7 @@ public class RobotControl {
         }
     }
 
-    public void controllerDrive(double axial, double lateral, double yaw) {
+    public void controllerDrive(double axial, double lateral, double yaw, double mod) {
         leftFrontPower  = axial + lateral + yaw;
         rightFrontPower = axial - lateral - yaw;
         leftBackPower   = axial - lateral + yaw;
@@ -117,6 +117,11 @@ public class RobotControl {
             leftBackPower   /= max;
             rightBackPower  /= max;
         }
+
+        leftFrontPower *= mod;
+        rightFrontPower *= mod;
+        leftBackPower *= mod;
+        rightBackPower *= mod;
     }
 
     public void armControl(double power){
@@ -194,16 +199,16 @@ public class RobotControl {
         
     }
 
-    public void updateDrive(double mod){
+    public void updateDrive(){
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         
-        leftFrontDrive.setPower(leftFrontPower * mod);
-        rightFrontDrive.setPower(rightFrontPower * mod);
-        leftBackDrive.setPower(leftBackPower * mod);
-        rightBackDrive.setPower(rightBackPower * mod);
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
     }
 
     public void resetDrive(){
