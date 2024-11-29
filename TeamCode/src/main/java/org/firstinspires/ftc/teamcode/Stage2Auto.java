@@ -26,18 +26,19 @@ public class Stage2Auto extends LinearOpMode {
             // Do nothing, just wait
         }
         robot.resetDrive();
-        robot.runServo(1);
+        robot.runServo(0.3);
         timer.reset();
         while (timer.seconds()<3){
 
         }
+        robot.strafe(1);
         robot.drive(-0.4);
-        while (timer.seconds() < 5){
+        while (timer.seconds() < 4){
 
         }
         robot.basketUndo();
         timer.reset();
-        while(timer.seconds()<2){
+        while(timer.seconds()<3){
 
         }
     }
