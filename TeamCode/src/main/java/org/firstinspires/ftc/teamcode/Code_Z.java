@@ -47,7 +47,9 @@ public class Code_Z extends LinearOpMode {
                 lateral=0;
             }
 
-            robot.controllerDrive(axial, lateral, yaw);
+            if (axial > 0 || lateral > 0 || yaw > 0){
+                robot.controllerDrive(axial, lateral, yaw, mod);
+            }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry
@@ -113,7 +115,7 @@ public class Code_Z extends LinearOpMode {
                 robot.intakeRotatorServo.setPosition(0.5);
             }
 
-            robot.updateDrive(mod);
+            robot.updateDrive();
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
