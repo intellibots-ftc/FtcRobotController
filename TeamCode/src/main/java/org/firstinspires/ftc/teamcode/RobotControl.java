@@ -178,7 +178,7 @@ public class RobotControl {
         }
     }
 
-    public void rotate (double end){
+    public void rotate (double end, double power){
         odo.update();
         Pose2D pos = odo.getPosition();
         double heading = pos.getHeading(AngleUnit.DEGREES);
@@ -189,10 +189,10 @@ public class RobotControl {
         leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
         rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
 
-        leftFrontDrive.setPower(1);
-        rightFrontDrive.setPower(1);
-        leftBackDrive.setPower(1);
-        rightBackDrive.setPower(1);
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(power);
         
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
