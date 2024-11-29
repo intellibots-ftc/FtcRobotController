@@ -60,7 +60,7 @@ public class Code_Z extends LinearOpMode {
                 lateral=0;
             }
 
-            if (robot.leftFrontDrive.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            if (robot.controlOn == 1) {
                 robot.controllerDrive(axial, lateral, yaw, mod);
             }
 
