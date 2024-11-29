@@ -78,8 +78,8 @@ public class Code_Z extends LinearOpMode {
             }
 
             if (gamepad1.dpad_left){
-                double curx, cury
-                robot.DriveToTarget(curx, cury, 0, 0);
+                robot.rotate(0);
+                robot.DriveToTarget(0, 0);
             }
 
             if (gamepad1.b) {
@@ -115,7 +115,9 @@ public class Code_Z extends LinearOpMode {
                 robot.intakeRotatorServo.setPosition(0.5);
             }
 
-            robot.updateDrive();
+            if (axial > 0 || lateral > 0 || yaw > 0){
+                robot.updateDrive();
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
