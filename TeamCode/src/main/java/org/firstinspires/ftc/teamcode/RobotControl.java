@@ -4,6 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
+import java.util.Locale;
 
 public class RobotControl {
 
@@ -24,6 +29,11 @@ public class RobotControl {
     public static final int ARM_HIGH = -2800;
     public static final int MAX_EXTENSION = -2000;
     public static final double TICKS_PER_DEGREE = 10;
+    public static final double TICKS_PER_MM = 1;
+    public static final double BASKET_X_AUTO = 0;
+    public static final double BASKET_Y_AUTO = 0;
+    public static final double BASKET_X_TELE = 0;
+    public static final double BASKET_Y_TELE = 0;
 
     private double leftFrontPower  = 0;
     private double rightFrontPower = 0;
@@ -31,6 +41,8 @@ public class RobotControl {
     private double rightBackPower  = 0;
     public int armTarget = 0;
     public int extTarget = 0;
+
+    GoBildaPinpointDriver odo;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotControl (LinearOpMode opmode) {
@@ -53,6 +65,12 @@ public class RobotControl {
         extensionMotor   = myOpMode.hardwareMap.get(DcMotor.class, "extension_motor");
         intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
         intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servo");
+        
+        odo = myOpMode.hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+        odo.setOffsets(8.0, -168.0);
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+         odo.resetPosAndIMU();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -160,11 +178,16 @@ public class RobotControl {
         }
     }
 
-    public void rotate (double start, double end){
-        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + Math.round((end - start) * TICKS_PER_DEGREE));
-        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + Math.round((start - end) * TICKS_PER_DEGREE));
-        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round((end - start) * TICKS_PER_DEGREE));
-        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round((start - end) * TICKS_PER_DEGREE));
+    public void rotate (double end){
+        odo.update();
+        Pose2D pos = odo.getPosition();
+        double heading = pos.getHeading(AngleUnit.DEGREES);
+        delta = heading - end;
+        
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
 
         leftFrontDrive.setPower(1);
         rightFrontDrive.setPower(1);
@@ -177,15 +200,21 @@ public class RobotControl {
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void DriveToTarget(double posx, double posy, double tarx, double tary, double power){
+    public void DriveToTarget(double tarx, double tary, double power){
+        odo.update();
+        Pose2D pos = odo.getPosition();
+        double posx = pos.getX(DistanceUnit.MM);
+        double posy = pos.getY(DistanceUnit.MM);
+        
         double sidex = tarx - posx;
         double sidey = tary - posy;
-        int hyp = Math.round(Math.hypot(sidex, sidey));
+        double hyp = Math.hypot(sidex, sidey);
+        hyp *= TICKS_PER_MM;
 
-        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + hyp);
-        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + hyp);
-        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + hyp);
-        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + hyp);
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + (int)hyp);
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + (int)hyp);
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + (int)hyp);
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + (int)hyp);
 
         leftFrontDrive.setPower(power);
         rightFrontDrive.setPower(power);
