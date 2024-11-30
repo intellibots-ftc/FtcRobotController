@@ -120,6 +120,11 @@ public class RobotControl {
     }
 
     public void controllerDrive(double axial, double lateral, double yaw, double mod) {
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        
         leftFrontPower  = axial + lateral + yaw;
         rightFrontPower = axial - lateral - yaw;
         leftBackPower   = axial - lateral + yaw;
@@ -185,6 +190,7 @@ public class RobotControl {
     }
 
     public void rotate (double end, double power){
+        controlOn = 0;
         odo.update();
         Pose2D pos = odo.getPosition();
         double heading = pos.getHeading(AngleUnit.DEGREES);
@@ -195,10 +201,10 @@ public class RobotControl {
         leftBackDrive.setTargetPosition((int)leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
         rightBackDrive.setTargetPosition((int)rightBackDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
 
-        leftFrontPower = power;
-        leftBackPower = power;
-        rightFrontPower = power;
-        rightBackPower = power;
+        leftFrontDrive.setPower(power);
+        rightFrontDrive.setPower(power);
+        leftBackDrive.setPower(power);
+        rightBackDrive.setPower(power);
         
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -211,6 +217,7 @@ public class RobotControl {
                 i = 1;
             }
         }
+        controlOn = 1;
     }
 
     public void DriveToTarget(double tarx, double tary, double power){
