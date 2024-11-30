@@ -120,10 +120,14 @@ public class RobotControl {
     }
 
     public void controllerDrive(double axial, double lateral, double yaw, double mod) {
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if (mod <= 1) {
+            leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        } else {
+            mod /= 100;
+        }
         
         leftFrontPower  = axial + lateral + yaw;
         rightFrontPower = axial - lateral - yaw;
@@ -189,7 +193,7 @@ public class RobotControl {
         }
     }
 
-    public void rotate (double end, double power){
+    /*public void rotate (double end, double power){
         controlOn = 0;
         odo.update();
         Pose2D pos = odo.getPosition();
@@ -218,29 +222,35 @@ public class RobotControl {
             }
         }
         controlOn = 1;
-    }
+    } */
 
-    public void DriveToTarget(double tarx, double tary, double power){
+    public void DriveToTarget(double tarx, double tary, double tarh, double power){
         controlOn = 0;
         odo.update();
+        
         Pose2D pos = odo.getPosition();
         double posx = pos.getX(DistanceUnit.MM);
         double posy = pos.getY(DistanceUnit.MM);
-        
-        double sidex = tarx - posx;
-        double sidey = tary - posy;
-        double hyp = Math.hypot(sidex, sidey);
-        hyp *= TICKS_PER_MM;
+        double head = pos.getHeading(AngleUnit.DEGREES)
 
-        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + (int)hyp);
-        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + (int)hyp);
-        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + (int)hyp);
-        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + (int)hyp);
+        double deltax = tarx - posx;
+        double deltay = tary - posy;
+        double yaw = tarh - head;
 
-        leftFrontDrive.setPower(power);
-        rightFrontDrive.setPower(power);
-        leftBackDrive.setPower(power);
-        rightBackDrive.setPower(power);
+        double axial = deltax * Math.cos(Math.toRadians(yaw)) + deltay * Math.sin(Math.toRadians(yaw));
+        double lateral = -deltax * Math.sin(Math.toRadians(yaw)) + deltay * Math.cos(Math.toRadians(yaw));
+
+        yaw *= TICKS_PER_DEGREE;
+
+        controllerDrive(axial, lateral, yaw, power * 100);
+
+        double avgWheelPower = (leftFrontPower + rightFrontPower + rightBackPower + leftBackPower) / 4;
+        double avgDistance = Math.hypot(axial, lateral) / avgWheelPower * TICKS_PER_MM;
+
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + leftFrontDrive.getPower() * avgDistance);
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + rightFrontDrive.getPower() * avgDistance);
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + leftBackDrive.getPower() * avgDistance);
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + rightBackDrive.getPower() * avgDistance);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -248,7 +258,7 @@ public class RobotControl {
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         int i = 0;
-        while (Math.abs(leftFrontDrive.getCurrentPosition()-leftFrontDrive.getTargetPosition()) > TICKS_PER_DEGREE && i == 0) {
+        while (Math.abs(leftFrontDrive.getCurrentPosition()-leftFrontDrive.getTargetPosition()) > 10 && i == 0) {
             if (myOpMode.gamepad1.dpad_right){
                 i = 1;
             }
