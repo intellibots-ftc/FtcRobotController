@@ -62,6 +62,9 @@ public class Code_Z extends LinearOpMode {
 
             if (robot.controlOn == 1) {
                 robot.controllerDrive(axial, lateral, yaw, mod);
+            } else if (axial > 0 || lateral > 0 || yaw > 0) {
+                robot.controllerDrive(axial, lateral, yaw, mod);
+                robot.controlOn = 1;
             }
 
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
@@ -91,8 +94,7 @@ public class Code_Z extends LinearOpMode {
             }
 
             if (gamepad1.dpad_left){
-                robot.rotate(0, 0.1);
-                robot.DriveToTarget(0, 0, 0.1);
+                robot.DriveToTarget(0, 0, 0, 0.1);
             }
 
             if (gamepad1.dpad_right){
