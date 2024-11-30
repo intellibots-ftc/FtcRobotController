@@ -24,9 +24,8 @@ public class Code_Z extends LinearOpMode {
     RobotControl robot = new RobotControl(this);
     private double mod = 1;
     private double slow = 1;
-    
-    GoBildaPinpointDriver odo;
 
+    
     @Override
     public void runOpMode() {
 
@@ -133,6 +132,7 @@ public class Code_Z extends LinearOpMode {
                 robot.intakeRotatorServo.setPosition(0.5);
             }
 
+            odo.update();
             Pose2D pos = odo.getPosition();
             String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
             telemetry.addData("odo Position", data);
