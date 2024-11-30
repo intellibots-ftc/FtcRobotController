@@ -28,7 +28,7 @@ public class RobotControl {
     public static final double ARM_HANG_POS = -1500;
     public static final int ARM_HIGH = -2800;
     public static final int MAX_EXTENSION = -2000;
-    public static final double TICKS_PER_DEGREE = 10;
+    public static final double TICKS_PER_DEGREE = 2500/360;
     public static final double TICKS_PER_MM = 1;
     public static final double BASKET_X_AUTO = 0;
     public static final double BASKET_Y_AUTO = 0;
