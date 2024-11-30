@@ -36,7 +36,7 @@ public class RobotControl {
     public static final double BASKET_Y_TELE = 0;
     
     private double leftFrontPower  = 0;
-    public controlOn = 1;
+    public int controlOn = 1;
     private double rightFrontPower = 0;
     private double leftBackPower   = 0;
     private double rightBackPower  = 0;
