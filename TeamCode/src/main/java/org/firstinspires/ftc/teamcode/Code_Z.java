@@ -20,6 +20,7 @@ public class Code_Z extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
+    GoBildaPinpointDriver odo;
     RobotControl robot = new RobotControl(this);
     private double mod = 1;
     private double slow = 1;
