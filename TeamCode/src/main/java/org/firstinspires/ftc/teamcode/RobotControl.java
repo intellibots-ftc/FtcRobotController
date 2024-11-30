@@ -188,12 +188,12 @@ public class RobotControl {
         odo.update();
         Pose2D pos = odo.getPosition();
         double heading = pos.getHeading(AngleUnit.DEGREES);
-        delta = heading - end;
+        double delta = heading - end;
         
-        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
-        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
-        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
-        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
+        leftFrontDrive.setTargetPosition((int)leftFrontDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
+        rightFrontDrive.setTargetPosition((int)rightFrontDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
+        leftBackDrive.setTargetPosition((int)leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
+        rightBackDrive.setTargetPosition((int)rightBackDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
 
         leftFrontPower = power;
         leftBackPower = power;
@@ -207,7 +207,7 @@ public class RobotControl {
 
         int i = 0;
         while (Math.abs(leftFrontDrive.getCurrentPosition()-leftFrontDrive.getTargetPosition()) > TICKS_PER_DEGREE && i == 0) {
-            if (myOpMode.gamepad1.dpad_left){
+            if (myOpMode.gamepad1.dpad_right){
                 i = 1;
             }
         }
