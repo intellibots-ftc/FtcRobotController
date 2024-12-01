@@ -70,7 +70,7 @@ public class RobotControl {
         odo = myOpMode.hardwareMap.get(GoBildaPinpointDriver.class,"odo");
         odo.setOffsets(8.0, -168.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.resetPosAndIMU();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
