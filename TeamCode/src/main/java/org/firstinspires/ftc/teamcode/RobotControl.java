@@ -169,9 +169,9 @@ public class RobotControl {
             armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armTarget = armMotor.getCurrentPosition();
         } else {
-            armMotor.setPower(1);
             armMotor.setTargetPosition(armTarget);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            armMotor.setPower(1);
         }
     }
 
@@ -187,9 +187,9 @@ public class RobotControl {
             extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extTarget = extensionMotor.getCurrentPosition();
         } else {
-            extensionMotor.setPower(1);
             extensionMotor.setTargetPosition(extTarget);
             extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            extensionMotor.setPower(1);
         }
     }
 
@@ -260,6 +260,18 @@ public class RobotControl {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void setDriveTargets(int a, int b, int c, int d){
+        leftFrontDrive.setTargetPosition(a);
+        rightFrontDrive.setTargetPosition(b);
+        leftBackDrive.setTargetPosition(c);
+        rightBackDrive.setTargetPosition(d);
+
+    }
+
+    public void targetStop(){
+        setDriveTargets(leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
     }
 
     public void resetDrive(){
