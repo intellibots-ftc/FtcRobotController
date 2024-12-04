@@ -13,11 +13,9 @@ public class Stage3Auto extends LinearOpMode {
     double final BASKET_X = 0;
     double final BASKET_Y = 0;
     double final SAMPLE_A_X = 0;
-    double final SAMPLE_A_Y = 0;
+    double final SAMPLES_Y = 0;
     double final SAMPLE_B_X = 0;
-    double final SAMPLE_B_Y = 0;
     double final SAMPLE_C_X = 0;
-    double final SAMPLE_B_Y = 0;
     double final ARM_TAKE = 0;
     double final EXTENSION_TAKE = 0;
     
@@ -26,27 +24,24 @@ public class Stage3Auto extends LinearOpMode {
     public void runOpMode(){
         robot.init();
         waitForStart();
+        ElapsedTime timer = new ElapsedTime();
         robot.armTarget = robot.ARM_HIGH;
         robot.extTarget = robot.MAX_EXTENSION;
         robot.driveToTarget(BASKET_X, BASKET_Y, 45,0.2);
-        ElapsedTime timer = new ElapsedTime();
-        timer.reset();
         robot.positionServo();
-        while (robot.controlOn == 0) {
-            // Do nothing, just wait
-        }
-        robot.powerDrive(0, 0, 0, 0);
+        robot.waitUntilReached();
+        robot.targetStop();
         robot.intake_servo.setPower(0.3);
         timer.reset();
         while (timer.seconds()<3){
 
         }
-        eobot.driveToTarget(SAMPLE_A_X, SAMPLE_A_Y, 0, 0.2);
+        robot.driveToTarget(SAMPLE_A_X, SAMPLES_Y, 0, 0.2);
         while (timer.seconds() < 4){
 
         }
         robot.armTarget = 1200;
-        timer.extTarget = EXTENSION_TAKE;
+        robot.extTarget = EXTENSION_TAKE;
         while(timer.seconds()<5){
 
         }
