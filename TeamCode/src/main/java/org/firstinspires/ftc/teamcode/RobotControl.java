@@ -237,24 +237,22 @@ public class RobotControl {
         double deltay = tary - posy;
         double yaw = tarh - head;
 
-        head = Math.toRadians(head);
-
-        double distance = Math.hypot(axial, lateral);
-
+        double distance = Math.hypot(deltax, deltay);
+        
         double axial = distance * Math.cos(yaw);
         double lateral = distance * Math.sin(yaw);
+        double distance = Math.hypot(axial, lateral);
 
         yaw *= TICKS_PER_DEGREE;
 
         controllerDrive(axial, lateral, yaw, power * 100);
 
-        double avgWheelPower = (leftFrontPower + rightFrontPower + rightBackPower + leftBackPower) / 4;
-        double avgDistance = distance / avgWheelPower * TICKS_PER_MM;
+        distance *= TICKS_PER_MM;
 
-        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + leftFrontDrive.getPower() * avgDistance);
-        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + rightFrontDrive.getPower() * avgDistance);
-        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + leftBackDrive.getPower() * avgDistance);
-        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + rightBackDrive.getPower() * avgDistance);
+        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + leftFrontDrive.getPower() * distance);
+        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + rightFrontDrive.getPower() * distance);
+        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + leftBackDrive.getPower() * distance);
+        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + rightBackDrive.getPower() * distance);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
