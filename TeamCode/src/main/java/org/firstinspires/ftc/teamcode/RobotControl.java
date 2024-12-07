@@ -239,8 +239,8 @@ public class RobotControl {
 
         double distance = Math.hypot(deltax, deltay);
         
-        double axial = distance * Math.cos(yaw);
-        double lateral = distance * Math.sin(yaw);
+        double axial = distance * Math.cos(Math.toRadians(yaw));
+        double lateral = distance * Math.sin(Math.toRadians(yaw));
         double distance = Math.hypot(axial, lateral);
 
         yaw *= TICKS_PER_DEGREE;
