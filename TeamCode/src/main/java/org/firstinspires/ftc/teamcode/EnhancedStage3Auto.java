@@ -17,11 +17,11 @@ public class EnhancedStage3Auto extends LinearOpMode {
     // Field coordinates (in mm)
     private static final double BASKET_X = 600;  // Adjust based on field measurements
     private static final double BASKET_Y = 300;  // Adjust based on field measurements
-    private static final double BASKET_HEADING = 45;  // Degrees
+    private static final double BASKET_HEADING = -45;  // Degrees
     
-    private static final double SAMPLE_A_X = -300;
-    private static final double SAMPLE_B_X = 0;
-    private static final double SAMPLE_C_X = 300;
+    private static final double SAMPLE_A_X = 0;
+    private static final double SAMPLE_B_X = 300;
+    private static final double SAMPLE_C_X = 600;
     private static final double SAMPLES_Y = -600;
     private static final double SAMPLE_HEADING = 0;
 
@@ -73,6 +73,13 @@ public class EnhancedStage3Auto extends LinearOpMode {
             moveToScoringPosition();
             
             // Score second pixel
+            scorePixel();
+
+            collectFromSpikeMark(SAMPLE_B_X);
+            moveToScoringPosition();
+            scorePixel();
+            collectFromSpikeMark(SAMPLE_C_X);
+            moveToScoringPosition();
             scorePixel();
             
             // Park in designated area
