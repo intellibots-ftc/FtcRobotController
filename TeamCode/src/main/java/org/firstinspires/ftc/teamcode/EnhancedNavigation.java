@@ -13,15 +13,15 @@ public class EnhancedNavigation {
 
     // Translation PIDF Constants
     private static final double TRANSLATION_KP = 0.03;  // Proportional gain for translation
-    private static final double TRANSLATION_KI = 0.001; // Integral gain for translation
-    private static final double TRANSLATION_KD = 0.01;  // Derivative gain for translation
-    private static final double TRANSLATION_KF = 0.15;  // Feed-forward term for translation
+    private static final double TRANSLATION_KI = 0.005; // Integral gain for translation
+    private static final double TRANSLATION_KD = 0.003;  // Derivative gain for translation
+    private static final double TRANSLATION_KF = 0.05;  // Feed-forward term for translation
 
     // Rotation PIDF Constants
-    private static final double ROTATION_KP = 0.05;    // Proportional gain for rotation
-    private static final double ROTATION_KI = 0.0005;  // Integral gain for rotation
-    private static final double ROTATION_KD = 0.02;    // Derivative gain for rotation
-    private static final double ROTATION_KF = 0.1;     // Feed-forward term for rotation
+    private static final double ROTATION_KP = 0.03;    // Proportional gain for rotation
+    private static final double ROTATION_KI = 0.005;  // Integral gain for rotation
+    private static final double ROTATION_KD = 0.003;    // Derivative gain for rotation
+    private static final double ROTATION_KF = 0.05;     // Feed-forward term for rotation
 
     // Error thresholds
     private static final double POSITION_TOLERANCE_MM = 10.0;
@@ -30,7 +30,7 @@ public class EnhancedNavigation {
     // Integral term limits
     private static final double MAX_TRANSLATION_INTEGRAL_ERROR = 200.0;
     private static final double MAX_ROTATION_INTEGRAL_ERROR = 45.0;
-    
+
     // Movement limits
     private static final double MAX_TRANSLATION_POWER = 0.8;
     private static final double MAX_ROTATION_POWER = 0.6;
@@ -44,7 +44,7 @@ public class EnhancedNavigation {
     private double integralXError = 0;
     private double integralYError = 0;
     private double integralHeadingError = 0;
-    
+
     public EnhancedNavigation(RobotControl robotControl, GoBildaPinpointDriver odometry) {
         this.robot = robotControl;
         this.odo = odometry;
@@ -57,11 +57,11 @@ public class EnhancedNavigation {
     public boolean navigateToPosition(double targetX, double targetY, double targetHeading) {
         odo.update();
         Pose2D currentPose = odo.getPosition();
-        
+
         // Get current position
         double currentX = currentPose.getX(DistanceUnit.MM);
-        double currentY = currentPose.getY(DistanceUnit.MM);
-        double currentHeading = currentPose.getHeading(AngleUnit.DEGREES);
+        double currentY = -currentPose.getY(DistanceUnit.MM);
+        double currentHeading = -currentPose.getHeading(AngleUnit.DEGREES);
 
         // Calculate errors
         double xError = targetX - currentX;
@@ -85,7 +85,7 @@ public class EnhancedNavigation {
         // Calculate translation PIDF
         double xPower = calculateTranslationPIDF(xError, integralXError, xDerivative);
         double yPower = calculateTranslationPIDF(yError, integralYError, yDerivative);
-        
+
         // Calculate rotation PIDF separately
         double headingPower = calculateRotationPIDF(headingError, integralHeadingError, headingDerivative);
 
@@ -119,8 +119,8 @@ public class EnhancedNavigation {
         robot.controllerDrive(axialPower, lateralPower, headingPower, 100);
 
         // Check if target reached
-        boolean atPosition = Math.abs(xError) < POSITION_TOLERANCE_MM && 
-                           Math.abs(yError) < POSITION_TOLERANCE_MM;
+        boolean atPosition = Math.abs(xError) < POSITION_TOLERANCE_MM &&
+                Math.abs(yError) < POSITION_TOLERANCE_MM;
         boolean atHeading = Math.abs(headingError) < HEADING_TOLERANCE_DEG;
 
         return atPosition && atHeading;
@@ -130,20 +130,20 @@ public class EnhancedNavigation {
      * Calculate PIDF output for translation components
      */
     private double calculateTranslationPIDF(double error, double integral, double derivative) {
-        return TRANSLATION_KP * error + 
-               TRANSLATION_KI * integral + 
-               TRANSLATION_KD * derivative + 
-               TRANSLATION_KF * Math.signum(error);
+        return TRANSLATION_KP * error +
+                TRANSLATION_KI * integral +
+                TRANSLATION_KD * derivative +
+                TRANSLATION_KF * Math.signum(error);
     }
 
     /**
      * Calculate PIDF output for rotation component
      */
     private double calculateRotationPIDF(double error, double integral, double derivative) {
-        return ROTATION_KP * error + 
-               ROTATION_KI * integral + 
-               ROTATION_KD * derivative + 
-               ROTATION_KF * Math.signum(error);
+        return ROTATION_KP * error +
+                ROTATION_KI * integral +
+                ROTATION_KD * derivative +
+                ROTATION_KF * Math.signum(error);
     }
 
     /**
