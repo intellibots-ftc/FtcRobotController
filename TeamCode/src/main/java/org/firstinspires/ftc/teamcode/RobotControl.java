@@ -34,7 +34,7 @@ public class RobotControl {
     public static final double BASKET_Y_AUTO = 0;
     public static final double BASKET_X_TELE = 0;
     public static final double BASKET_Y_TELE = 0;
-    
+
     private double leftFrontPower  = 0;
     public int controlOn = 1;
     private double rightFrontPower = 0;
@@ -66,7 +66,7 @@ public class RobotControl {
         extensionMotor   = myOpMode.hardwareMap.get(DcMotor.class, "extension_motor");
         intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
         intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servo");
-        
+
         odo = myOpMode.hardwareMap.get(GoBildaPinpointDriver.class,"odo");
         odo.setOffsets(8.0, -168.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
@@ -106,7 +106,7 @@ public class RobotControl {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        
+
         leftFrontPower  = lf;
         rightFrontPower = rf;
         leftBackPower   = lb;
@@ -128,7 +128,7 @@ public class RobotControl {
         } else {
             mod /= 100;
         }
-        
+
         leftFrontPower  = axial + lateral + yaw;
         rightFrontPower = axial - lateral - yaw;
         leftBackPower   = axial - lateral + yaw;
@@ -199,7 +199,7 @@ public class RobotControl {
         Pose2D pos = odo.getPosition();
         double heading = pos.getHeading(AngleUnit.DEGREES);
         double delta = heading - end;
-        
+
         leftFrontDrive.setTargetPosition((int)leftFrontDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
         rightFrontDrive.setTargetPosition((int)rightFrontDrive.getCurrentPosition() + Math.round(delta * TICKS_PER_DEGREE));
         leftBackDrive.setTargetPosition((int)leftBackDrive.getCurrentPosition() + Math.round(-delta * TICKS_PER_DEGREE));
@@ -209,7 +209,7 @@ public class RobotControl {
         rightFrontDrive.setPower(power);
         leftBackDrive.setPower(power);
         rightBackDrive.setPower(power);
-        
+
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -227,21 +227,20 @@ public class RobotControl {
     public void DriveToTarget(double tarx, double tary, double tarh, double power){
         controlOn = 0;
         odo.update();
-        
+
         Pose2D pos = odo.getPosition();
         double posx = pos.getX(DistanceUnit.MM);
         double posy = pos.getY(DistanceUnit.MM);
-        double head = -pos.getHeading(AngleUnit.DEGREES)
+        double head = -pos.getHeading(AngleUnit.DEGREES);
 
         double deltax = tarx - posx;
         double deltay = tary - posy;
         double yaw = tarh - head;
 
         double distance = Math.hypot(deltax, deltay);
-        
+
         double axial = distance * Math.cos(Math.toRadians(yaw));
         double lateral = distance * Math.sin(Math.toRadians(yaw));
-        double distance = Math.hypot(axial, lateral);
 
         yaw *= TICKS_PER_DEGREE;
 
@@ -249,10 +248,10 @@ public class RobotControl {
 
         distance *= TICKS_PER_MM;
 
-        leftFrontDrive.setTargetPosition(leftFrontDrive.getCurrentPosition() + leftFrontDrive.getPower() * distance);
-        rightFrontDrive.setTargetPosition(rightFrontDrive.getCurrentPosition() + rightFrontDrive.getPower() * distance);
-        leftBackDrive.setTargetPosition(leftBackDrive.getCurrentPosition() + leftBackDrive.getPower() * distance);
-        rightBackDrive.setTargetPosition(rightBackDrive.getCurrentPosition() + rightBackDrive.getPower() * distance);
+        leftFrontDrive.setTargetPosition((int) (leftFrontDrive.getCurrentPosition() + leftFrontDrive.getPower() * distance));
+        rightFrontDrive.setTargetPosition((int) (rightFrontDrive.getCurrentPosition() + rightFrontDrive.getPower() * distance));
+        leftBackDrive.setTargetPosition((int) (leftBackDrive.getCurrentPosition() + leftBackDrive.getPower() * distance));
+        rightBackDrive.setTargetPosition((int) (rightBackDrive.getCurrentPosition() + rightBackDrive.getPower() * distance));
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -274,7 +273,7 @@ public class RobotControl {
 
     public void waitUntilReached(){
         while (Math.abs(leftFrontDrive.getCurrentPosition() - leftFrontDrive.getTargetPosition()) > 10) {
-            
+
         }
     }
 
@@ -283,7 +282,7 @@ public class RobotControl {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        
+
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
