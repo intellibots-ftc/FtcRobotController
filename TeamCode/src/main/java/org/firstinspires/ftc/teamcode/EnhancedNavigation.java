@@ -24,8 +24,8 @@ public class EnhancedNavigation {
     private static final double ROTATION_KF = 0.05;     // Feed-forward term for rotation
 
     // Error thresholds
-    private static final double POSITION_TOLERANCE_MM = 10.0;
-    private static final double HEADING_TOLERANCE_DEG = 2.0;
+    private static final double POSITION_TOLERANCE_MM = 50.0;
+    private static final double HEADING_TOLERANCE_DEG = 5.0;
 
     // Integral term limits
     private static final double MAX_TRANSLATION_INTEGRAL_ERROR = 200.0;
@@ -54,7 +54,7 @@ public class EnhancedNavigation {
     /**
      * Navigate to target position using PIDF control with separate translation and rotation parameters
      */
-    public boolean navigateToPosition(double targetX, double targetY, double targetHeading) {
+    public boolean navigateToPosition(double targetX, double targetY, double targetHeading, double power) {
         odo.update();
         Pose2D currentPose = odo.getPosition();
 
@@ -116,7 +116,7 @@ public class EnhancedNavigation {
         lastHeadingError = headingError;
 
         // Apply motor powers
-        robot.controllerDrive(axialPower, lateralPower, headingPower, 100);
+        robot.controllerDrive(axialPower, lateralPower, headingPower, 100 * power);
 
         // Check if target reached
         boolean atPosition = Math.abs(xError) < POSITION_TOLERANCE_MM &&
