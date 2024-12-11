@@ -32,10 +32,10 @@ public class EnhancedNavigation {
     private static final double MAX_ROTATION_INTEGRAL_ERROR = 45.0;
 
     // Movement limits
-    private static final double MAX_TRANSLATION_POWER = 0.8;
-    private static final double MAX_ROTATION_POWER = 0.6;
-    private static final double MIN_TRANSLATION_POWER = 0.1;
-    private static final double MIN_ROTATION_POWER = 0.08;
+    private static final double MAX_TRANSLATION_POWER = 1;
+    private static final double MAX_ROTATION_POWER = 1;
+    private static final double MIN_TRANSLATION_POWER = 0.0;
+    private static final double MIN_ROTATION_POWER = 0.0;
 
     // Error tracking
     private double lastXError = 0;
