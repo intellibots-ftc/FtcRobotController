@@ -24,6 +24,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private static final double SAMPLE_C_X = 600;
     private static final double SAMPLES_Y = -600;
     private static final double SAMPLE_HEADING = 0;
+    private static final double power = 0.2;
 
     // Arm positions
     private static final int ARM_SCORING = -2800;  // Scoring position
@@ -34,7 +35,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
     // Timeouts
     private static final double NAVIGATION_TIMEOUT = 5.0;  // seconds
     private static final double SCORING_TIMEOUT = 3.0;  // seconds
-    private static final double COLLECTION_TIMEOUT = 2.0;  // seconds
+    private static final double COLLECTION_TIMEOUT = 3.0;  // seconds
 
     @Override
     public void runOpMode() {
@@ -50,7 +51,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
         odo.resetPosAndIMU();
         
         navigation = new EnhancedNavigation(robot, odo);
-        runtime = new ElapsedTime();
+        timer = new ElapsedTime();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -102,7 +103,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
         // Navigate to basket position
         runtime.reset();
         while (opModeIsActive() && runtime.seconds() < NAVIGATION_TIMEOUT) {
-            if (navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING)) {
+            if (navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, power)) {
                 break;
             }
             
@@ -159,6 +160,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
         
         robot.intakeServo.setPower(0);
     }
+
 
     private void parkRobot() throws InterruptedException {
         telemetry.addData("Status", "Parking");
