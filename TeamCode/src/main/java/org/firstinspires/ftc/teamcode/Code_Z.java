@@ -52,7 +52,7 @@ public class Code_Z extends LinearOpMode {
 
             if (isNavigatingToBasket) {
                 // Use enhanced navigation to move to basket position
-                boolean atTarget = navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING);
+                boolean atTarget = navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, 0.5);
                 if (atTarget) {
                     isNavigatingToBasket = false;
                     robot.controlOn = 1; // Re-enable manual control
