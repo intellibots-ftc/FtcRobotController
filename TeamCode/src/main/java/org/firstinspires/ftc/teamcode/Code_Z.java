@@ -19,8 +19,8 @@ public class Code_Z extends LinearOpMode {
     private boolean isNavigatingToBasket = false;
 
     // Basket coordinates (adjust these based on your field setup)
-    private static final double BASKET_X = robot.BASKET_X_TELE;  // Using constant from RobotControl
-    private static final double BASKET_Y = robot.BASKET_Y_TELE;  // Using constant from RobotControl
+    private final double BASKET_X = robot.BASKET_X_TELE;  // Using constant from RobotControl
+    private final double BASKET_Y = robot.BASKET_Y_TELE;  // Using constant from RobotControl
     private static final double BASKET_HEADING = -45.0;  // Degrees
     
     @Override
