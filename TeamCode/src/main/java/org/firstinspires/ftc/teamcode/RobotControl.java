@@ -186,7 +186,7 @@ public class RobotControl {
             extensionMotor.setPower(power * validity);
             extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             extTarget = extensionMotor.getCurrentPosition();
-        } else if (extTarget < -200) {
+        } else if (extensionMotor.getCurrentPosition() < -60) {
             extensionMotor.setTargetPosition(extTarget);
             extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             extensionMotor.setPower(1);
