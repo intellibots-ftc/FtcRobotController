@@ -64,6 +64,8 @@ public class EnhancedStage3Auto extends LinearOpMode {
         // Main autonomous sequence
         try {
             // Move to scoring position
+            robot.positionServo();
+            
             moveToScoringPosition();
 
             // Score the pixel
