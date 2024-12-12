@@ -7,18 +7,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import java.io.BufferedInputStream;
+
 @Autonomous(name="Enhanced Stage 3 Auto", group="Competition")
 public class EnhancedStage3Auto extends LinearOpMode {
     private RobotControl robot;
     private GoBildaPinpointDriver odo;
     private EnhancedNavigation navigation;
-    private ElapsedTime runtime;
+    private ElapsedTime timer;
 
     // Field coordinates (in mm)
     private static final double BASKET_X = 1000;  // Adjust based on field measurements
     private static final double BASKET_Y = 200;  // Adjust based on field measurements
     private static final double BASKET_HEADING = -45;  // Degrees
-    
+
     private static final double SAMPLE_A_X = 640;
     private static final double SAMPLE_B_X = 860;
     private static final double SAMPLE_C_X = 1150;
@@ -42,37 +44,37 @@ public class EnhancedStage3Auto extends LinearOpMode {
         // Initialize robot hardware
         robot = new RobotControl(this);
         robot.init();
-        
+
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         odo.setOffsets(8.0, -168.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, 
-                                GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
+                GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.resetPosAndIMU();
-        
+
         navigation = new EnhancedNavigation(robot, odo);
-        timer = new ElapsedTime();
+        ElapsedTime timer = new ElapsedTime();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         waitForStart();
-        runtime.reset();
+        timer.reset();
 
         // Main autonomous sequence
         try {
             // Move to scoring position
             moveToScoringPosition();
-            
+
             // Score the pixel
             scorePixel();
-            
+
             // Move to and collect from spike mark A
             collectFromSpikeMark(SAMPLE_A_X);
-            
+
             // Return to scoring position
             moveToScoringPosition();
-            
+
             // Score second pixel
             scorePixel();
 
@@ -82,10 +84,10 @@ public class EnhancedStage3Auto extends LinearOpMode {
             collectFromSpikeMark(SAMPLE_C_X);
             moveToScoringPosition();
             scorePixel();
-            
+
             // Park in designated area
             parkRobot();
-            
+
         } catch (InterruptedException e) {
             telemetry.addData("Error", "Autonomous sequence interrupted");
             telemetry.update();
@@ -95,25 +97,26 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private void moveToScoringPosition() throws InterruptedException {
         telemetry.addData("Status", "Moving to scoring position");
         telemetry.update();
-        
+
         // Set arm to scoring position
         robot.armTarget = ARM_SCORING;
         robot.extTarget = EXTENSION_SCORING;
-        
+
         // Navigate to basket position
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < NAVIGATION_TIMEOUT) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
             if (navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, power)) {
                 break;
             }
-            
+
             // Show current position for debugging
             Pose2D currentPose = odo.getPosition();
             telemetry.addData("Current X", currentPose.getX(DistanceUnit.MM));
             telemetry.addData("Current Y", currentPose.getY(DistanceUnit.MM));
             telemetry.addData("Current Heading", currentPose.getHeading(AngleUnit.DEGREES));
             telemetry.update();
-            
+
             if (!opModeIsActive()) throw new InterruptedException();
         }
     }
@@ -121,43 +124,45 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private void scorePixel() throws InterruptedException {
         telemetry.addData("Status", "Scoring pixel");
         telemetry.update();
-        
+
         // Activate intake servo to release pixel
         robot.intakeServo.setPower(0.3);
-        
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < SCORING_TIMEOUT) {
+
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (opModeIsActive() && timer.seconds() < SCORING_TIMEOUT) {
             if (!opModeIsActive()) throw new InterruptedException();
         }
-        
+
         robot.intakeServo.setPower(0);
     }
 
     private void collectFromSpikeMark(double sampleX) throws InterruptedException {
         telemetry.addData("Status", "Collecting from spike mark");
         telemetry.update();
-        
+
         // Move arm to collecting position
         robot.armTarget = ARM_COLLECTING;
         robot.extTarget = EXTENSION_COLLECTING;
-        
+
         // Navigate to sample position
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < NAVIGATION_TIMEOUT) {
-            if (navigation.navigateToPosition(sampleX, SAMPLES_Y, SAMPLE_HEADING)) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
+            if (navigation.navigateToPosition(sampleX, SAMPLES_Y, SAMPLE_HEADING,0.2)) {
                 break;
             }
             if (!opModeIsActive()) throw new InterruptedException();
         }
-        
+
         // Activate intake to collect pixel
         robot.intakeServo.setPower(-0.5);
-        
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < COLLECTION_TIMEOUT) {
+
+        timer.reset();
+        while (opModeIsActive() && timer.seconds() < COLLECTION_TIMEOUT) {
             if (!opModeIsActive()) throw new InterruptedException();
         }
-        
+
         robot.intakeServo.setPower(0);
     }
 
@@ -165,15 +170,15 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private void parkRobot() throws InterruptedException {
         telemetry.addData("Status", "Parking");
         telemetry.update();
-        
+
         // Move arm to safe position
         robot.armTarget = -1500;  // Safe position
         robot.extTarget = -50;    // Retracted position
-        
+
         // Navigate to parking position (adjust coordinates as needed)
-        runtime.reset();
-        while (opModeIsActive() && runtime.seconds() < NAVIGATION_TIMEOUT) {
-            if (navigation.navigateToPosition(0, 0, 0)) {
+        timer.reset();
+        while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
+            if (navigation.navigateToPosition(0, 0, 0,0.2)) {
                 break;
             }
             if (!opModeIsActive()) throw new InterruptedException();
