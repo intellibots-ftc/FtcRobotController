@@ -32,8 +32,8 @@ public class RobotControl {
     public static final double TICKS_PER_MM = 1;
     public static final double BASKET_X_AUTO = 0;
     public static final double BASKET_Y_AUTO = 0;
-    public static final double BASKET_X_TELE = 0;
-    public static final double BASKET_Y_TELE = 0;
+    public static final double BASKET_X_TELE = 1000;
+    public static final double BASKET_Y_TELE = 200;
 
     private double leftFrontPower  = 0;
     public int controlOn = 1;
