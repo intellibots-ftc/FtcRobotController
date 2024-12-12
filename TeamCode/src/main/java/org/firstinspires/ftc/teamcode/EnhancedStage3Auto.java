@@ -17,7 +17,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private ElapsedTime timer;
 
     // Field coordinates (in mm)
-    private static final double BASKET_X = 1000;  // Adjust based on field measurements
+    private static final double BASKET_X = 950;  // Adjust based on field measurements
     private static final double BASKET_Y = 200;  // Adjust based on field measurements
     private static final double BASKET_HEADING = -45;  // Degrees
 
