@@ -26,7 +26,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private static final double SAMPLE_C_X = 1150;
     private static final double SAMPLES_Y = -950;
     private static final double SAMPLE_HEADING = 0;
-    private static final double power = 0.2;
+    private static final double power = 0.4;
 
     // Arm positions
     private static final int ARM_SCORING = -2800;  // Scoring position
@@ -109,6 +109,8 @@ public class EnhancedStage3Auto extends LinearOpMode {
             if (navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, power)) {
                 break;
             }
+            robot.armControl(0);
+            robot.extendControl(0);
 
             // Show current position for debugging
             Pose2D currentPose = odo.getPosition();
@@ -149,9 +151,12 @@ public class EnhancedStage3Auto extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
-            if (navigation.navigateToPosition(sampleX, SAMPLES_Y, SAMPLE_HEADING,0.2)) {
+            if (navigation.navigateToPosition(sampleX, SAMPLES_Y, SAMPLE_HEADING, power)) {
                 break;
             }
+            robot.armControl(0);
+            robot.extendControl(0);
+            
             if (!opModeIsActive()) throw new InterruptedException();
         }
 
@@ -160,6 +165,9 @@ public class EnhancedStage3Auto extends LinearOpMode {
 
         timer.reset();
         while (opModeIsActive() && timer.seconds() < COLLECTION_TIMEOUT) {
+            robot.armControl(0);
+            robot.extendControl(0);
+            
             if (!opModeIsActive()) throw new InterruptedException();
         }
 
@@ -178,9 +186,12 @@ public class EnhancedStage3Auto extends LinearOpMode {
         // Navigate to parking position (adjust coordinates as needed)
         timer.reset();
         while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
-            if (navigation.navigateToPosition(0, 0, 0,0.2)) {
+            if (navigation.navigateToPosition(0, 0, 0, power)) {
                 break;
             }
+            robot.armControl(0);
+            robot.extendControl(0);
+            
             if (!opModeIsActive()) throw new InterruptedException();
         }
     }
