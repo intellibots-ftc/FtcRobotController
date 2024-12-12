@@ -19,21 +19,21 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private static final double BASKET_Y = 200;  // Adjust based on field measurements
     private static final double BASKET_HEADING = -45;  // Degrees
     
-    private static final double SAMPLE_A_X = 0;
+    private static final double SAMPLE_A_X = 640;
     private static final double SAMPLE_B_X = 300;
     private static final double SAMPLE_C_X = 600;
-    private static final double SAMPLES_Y = -600;
+    private static final double SAMPLES_Y = -940;
     private static final double SAMPLE_HEADING = 0;
     private static final double power = 0.2;
 
     // Arm positions
     private static final int ARM_SCORING = -2800;  // Scoring position
-    private static final int ARM_COLLECTING = -800;  // Collecting position
+    private static final int ARM_COLLECTING = -0;  // Collecting position
     private static final int EXTENSION_SCORING = -2000;
-    private static final int EXTENSION_COLLECTING = -500;
+    private static final int EXTENSION_COLLECTING = -0;
 
     // Timeouts
-    private static final double NAVIGATION_TIMEOUT = 5.0;  // seconds
+    private static final double NAVIGATION_TIMEOUT = 7.0;  // seconds
     private static final double SCORING_TIMEOUT = 3.0;  // seconds
     private static final double COLLECTION_TIMEOUT = 3.0;  // seconds
 
