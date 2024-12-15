@@ -20,7 +20,7 @@ import java.util.List;
 @Autonomous
 public class TelePlayerTest extends LinearOpMode {
     
-    String FILENAME = "AUTO_TEST";
+    String FILENAME = "RECORDED_AUTO";
 
 
     ArrayList<HashMap<String, Double>> recording = new ArrayList<>();
