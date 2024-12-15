@@ -97,6 +97,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
     }
 
     private void moveToScoringPosition() throws InterruptedException {
+        navigation.resetController();
         telemetry.addData("Status", "Moving to scoring position");
         telemetry.update();
 
