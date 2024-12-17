@@ -22,7 +22,7 @@ public class Code_Z extends LinearOpMode {
     private final double BASKET_X = robot.BASKET_X_TELE;  // Using constant from RobotControl
     private final double BASKET_Y = robot.BASKET_Y_TELE;  // Using constant from RobotControl
     private static final double BASKET_HEADING = -45.0;  // Degrees
-    
+
     @Override
     public void runOpMode() {
         // Initialize robot hardware
@@ -52,12 +52,13 @@ public class Code_Z extends LinearOpMode {
 
             if (isNavigatingToBasket) {
                 // Use enhanced navigation to move to basket position
-                boolean atTarget = navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, 0.5);
+                boolean atTarget = navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, 0.8);
                 if (atTarget) {
                     isNavigatingToBasket = false;
-                    robot.controlOn = 1; // Re-enable manual control
+                    robot.controlOn = 1;
+                    robot.targetStop();// Re-enable manual control
                 }
-                
+
                 // Allow cancellation of automatic navigation with dpad_right
                 if (gamepad1.dpad_right) {
                     isNavigatingToBasket = false;
@@ -101,11 +102,11 @@ public class Code_Z extends LinearOpMode {
 
             // Manual arm control
             if (gamepad1.b) {
-                robot.armControl(mod);
+                robot.armControl(mod, 1);
             } else if (gamepad1.y) {
-                robot.armControl(-mod);
+                robot.armControl(-mod, 1);
             } else {
-                robot.armControl(0);
+                robot.armControl(0, 1);
             }
 
             // Intake control
@@ -138,10 +139,10 @@ public class Code_Z extends LinearOpMode {
             // Update odometry and telemetry
             odo.update();
             Pose2D pos = odo.getPosition();
-            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", 
-                pos.getX(DistanceUnit.MM), 
-                pos.getY(DistanceUnit.MM), 
-                pos.getHeading(AngleUnit.DEGREES));
+            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}",
+                    pos.getX(DistanceUnit.MM),
+                    pos.getY(DistanceUnit.MM),
+                    pos.getHeading(AngleUnit.DEGREES));
 
             // Telemetry updates
             telemetry.addData("odo Position", data);
