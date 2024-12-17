@@ -157,7 +157,7 @@ public class RobotControl {
         rightBackDrive.setPower(rightBackPower);
     }
 
-    public void armControl(double power){
+    public void armControl(double power, double cPower){
         if (power != 0){
             int validity = 1; /*
             if (power > 0 && armMotor.getCurrentPosition() < -50){
@@ -171,7 +171,7 @@ public class RobotControl {
         } else {
             armMotor.setTargetPosition(armTarget);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(1);
+            armMotor.setPower(cPower);
         }
     }
 
@@ -289,5 +289,9 @@ public class RobotControl {
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
         rightBackDrive.setPower(0);
+    }
+
+    public void positionServo() {
+        intakeRotatorServo.setPosition(0.5);
     }
 }
