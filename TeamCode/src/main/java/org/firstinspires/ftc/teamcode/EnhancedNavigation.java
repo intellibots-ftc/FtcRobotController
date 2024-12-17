@@ -8,13 +8,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class EnhancedNavigation {
     private RobotControl robot;
-    private GoBildaPinpointDriver odo;
+    public GoBildaPinpointDriver odo;
     private ElapsedTime timer;
 
     // Translation PIDF Constants
     private static final double TRANSLATION_KP = 0.03;  // Proportional gain for translation
-    private static final double TRANSLATION_KI = 0.005; // Integral gain for translation
-    private static final double TRANSLATION_KD = 0.003;  // Derivative gain for translation
+    private static final double TRANSLATION_KI = 0.003; // Integral gain for translation
+    private static final double TRANSLATION_KD = 0.005;  // Derivative gain for translation
     private static final double TRANSLATION_KF = 0.05;  // Feed-forward term for translation
 
     // Rotation PIDF Constants
