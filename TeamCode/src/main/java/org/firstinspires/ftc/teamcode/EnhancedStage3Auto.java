@@ -111,8 +111,12 @@ public class EnhancedStage3Auto extends LinearOpMode {
         // Navigate to basket position
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
+        odo.update();
+        double startX = odo.getPosX();
+        double startY = odo.getPosY();
+        double startH = odo.getHeading();
         while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
-            boolean atTarget = navigation.navigateToPosition(BASKET_X-400, BASKET_Y+300, BASKET_HEADING, power);
+            boolean atTarget = navigation.navigateToPosition((BASKET_X + startX) / 2, (BASKET_Y - startY) / 2, (BASKET_HEADING - startH) / 3 *2, power);
             if (atTarget){
                 break;
             }
@@ -174,7 +178,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
-            if (navigation.navigateToPosition(sampleX - 100, SAMPLES_Y - 200, SAMPLE_HEADING, power)) {
+            if (navigation.navigateToPosition(sampleX/2 + 150, SAMPLES_Y - 250, SAMPLE_HEADING, power)) {
                 break;
             }
             robot.armControl(0, 0.3);
@@ -189,6 +193,13 @@ public class EnhancedStage3Auto extends LinearOpMode {
         robot.intakeServo.setPower(0.5);
         robot.resetDrive();
         navigation.resetController();
+        timer.reset();
+        while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
+            if (navigation.navigateToPosition(sampleX/2 + 150, SAMPLES_Y, SAMPLE_HEADING, power)) {
+                break;
+            }
+            updateTelemetry();
+        }
         while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
             if (navigation.navigateToPosition(sampleX, SAMPLES_Y, SAMPLE_HEADING, power)) {
                 break;
