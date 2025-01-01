@@ -27,7 +27,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
     private static final double SAMPLE_C_X = 1050;
     private static final double SAMPLES_Y = 900;
     private static final double SAMPLE_HEADING = 0;
-    private static final double power = 0.2;
+    private static final double power = 0.5;
 
     // Arm positions
     private static final int ARM_SCORING = -2800;  // Scoring position
@@ -38,7 +38,9 @@ public class EnhancedStage3Auto extends LinearOpMode {
     // Timeouts
     private static final double NAVIGATION_TIMEOUT = 70.0;  // seconds
     private static final double SCORING_TIMEOUT = 3.0;  // seconds
-    private static final double COLLECTION_TIMEOUT = 3.0;  // seconds
+    private static final double COLLECTION_TIMEOUT = 3.0;
+
+    private static final double cPower = power * 1.5;// seconds
 
     @Override
     public void runOpMode() {
@@ -47,17 +49,19 @@ public class EnhancedStage3Auto extends LinearOpMode {
         robot.init();
 
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        odo.setOffsets(8.0, -168.0);
+        odo.setOffsets(-8.0, -168.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED,
                 GoBildaPinpointDriver.EncoderDirection.REVERSED);
         odo.resetPosAndIMU();
+        odo.recalibrateIMU();
 
         navigation = new EnhancedNavigation(robot, odo);
         ElapsedTime timer = new ElapsedTime();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        odo.recalibrateIMU();
 
         waitForStart();
         timer.reset();
@@ -65,8 +69,9 @@ public class EnhancedStage3Auto extends LinearOpMode {
         // Main autonomous sequence
         try {
             // Move to scoring position
-            robot.armMotor.setPower(0.3);
+            robot.armMotor.setPower(Math.min(1, cPower));
             robot.positionServo();
+            robot.controllerDrive(0, 1, 0, 1);
             parkRobot();
 
             moveToScoringPosition();
@@ -116,7 +121,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
         double startY = odo.getPosY();
         double startH = odo.getHeading();
         while (opModeIsActive() && timer.seconds() < NAVIGATION_TIMEOUT) {
-            boolean atTarget = navigation.navigateToPosition((BASKET_X + startX) / 2, (BASKET_Y - startY) / 2, (BASKET_HEADING - startH) / 3 *2, power);
+            boolean atTarget = navigation.navigateToPosition((BASKET_X + startX) / 2, (BASKET_Y - startY) / 2, BASKET_HEADING, power);
             if (atTarget){
                 break;
             }
@@ -181,7 +186,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
             if (navigation.navigateToPosition(sampleX/2 + 150, SAMPLES_Y - 250, SAMPLE_HEADING, power)) {
                 break;
             }
-            robot.armControl(0, 0.3);
+            robot.armControl(0, cPower);
             robot.extendControl(0);
 
             updateTelemetry();
@@ -210,7 +215,7 @@ public class EnhancedStage3Auto extends LinearOpMode {
         timer.reset();
         robot.resetDrive();
         while (opModeIsActive() && timer.seconds() < COLLECTION_TIMEOUT) {
-            robot.armControl(0, 0.3);
+            robot.armControl(0, cPower);
             robot.extendControl(0);
             telemetry.addData("Sigma", "boy");
             telemetry.update();
@@ -238,8 +243,9 @@ public class EnhancedStage3Auto extends LinearOpMode {
             if (navigation.navigateToPosition(0, 200, 0, power)) {
                 break;
             }
-            robot.armControl(0, 0.3);
+            robot.armControl(0, cPower);
             robot.extendControl(0);
+            updateTelemetry();
 
             if (!opModeIsActive()) throw new InterruptedException();
         }
