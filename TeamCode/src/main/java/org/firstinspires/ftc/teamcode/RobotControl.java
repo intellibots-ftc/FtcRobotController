@@ -172,7 +172,7 @@ public class RobotControl {
         extTimer.reset();
         extTarget += 2500.0 * power * de;
         extTarget = (int) navigation.clamp(extTarget, -2150, 0);
-        armTarget = (int) Math.min(armTarget, extTarget/3.7);
+        armTarget = (int) Math.min(armTarget, Math.max(-(160+Math.pow(-extTarget, 0.8)), -600));
         double extP = navigation.calculateExtensionPIDF(extensionMotor.getCurrentPosition(), extTarget, armMotor.getCurrentPosition(), de);
         extensionMotor.setPower(extP);
     }
