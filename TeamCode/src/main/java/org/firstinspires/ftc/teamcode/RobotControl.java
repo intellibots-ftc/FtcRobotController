@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -27,23 +29,26 @@ public class RobotControl {
 
     public static final double ARM_HANG_POS = -1500;
     public static final int ARM_HIGH = -2800;
-    public static final int MAX_EXTENSION = -2000;
+    public static final int MAX_EXTENSION = -2150;
     public static final double TICKS_PER_DEGREE = 2500/360;
     public static final double TICKS_PER_MM = 1;
     public static final double BASKET_X_AUTO = 0;
     public static final double BASKET_Y_AUTO = 0;
-    public static final double BASKET_X_TELE = 950;
-    public static final double BASKET_Y_TELE = 180;
+    public static final double BASKET_X_TELE = 940;
+    public static final double BASKET_Y_TELE = -230;
 
     private double leftFrontPower  = 0;
     public int controlOn = 1;
     private double rightFrontPower = 0;
     private double leftBackPower   = 0;
     private double rightBackPower  = 0;
-    public int armTarget = 0;
-    public int extTarget = 0;
-
-    GoBildaPinpointDriver odo;
+    public int armTarget;
+    public int extTarget;
+    private ElapsedTime armTimer;
+    private ElapsedTime extTimer;
+    private GoBildaPinpointDriver odo;
+    private EnhancedNavigation navigation;
+    public double da;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotControl (LinearOpMode opmode) {
@@ -57,6 +62,10 @@ public class RobotControl {
      * All of the hardware devices are accessed via the hardware map, and initialized.
      */
     public void init()    {
+        armTimer = new ElapsedTime();
+        extTimer = new ElapsedTime();
+        odo = myOpMode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        navigation = new EnhancedNavigation(this, odo);
         // Define and Initialize Motors (note: need to use reference to actual OpMode).
         leftFrontDrive  = myOpMode.hardwareMap.get(DcMotor.class, "left_front_drive");
         leftBackDrive  = myOpMode.hardwareMap.get(DcMotor.class, "left_back_drive");
@@ -66,12 +75,6 @@ public class RobotControl {
         extensionMotor   = myOpMode.hardwareMap.get(DcMotor.class, "extension_motor");
         intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
         intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servo");
-
-        odo = myOpMode.hardwareMap.get(GoBildaPinpointDriver.class,"odo");
-        odo.setOffsets(8.0, -168.0);
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        odo.resetPosAndIMU();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -90,18 +93,24 @@ public class RobotControl {
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeServo.setDirection(DcMotor.Direction.REVERSE);
+
+        myOpMode.telemetry.addData(">", "Hardware Initialized");
+        myOpMode.telemetry.update();
+
+        extTarget = extensionMotor.getCurrentPosition();
+        armTarget = armMotor.getCurrentPosition();
+        armMotor.setTargetPosition(armTarget);
+        extensionMotor.setTargetPosition(extTarget);
+    }
+
+    public void resetEncoders(){
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extensionMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        myOpMode.telemetry.addData(">", "Hardware Initialized");
-        myOpMode.telemetry.update();
     }
 
-    public void powerDrive(double lf, double rf, double lb, double rb){
+    /*public void powerDrive(double lf, double rf, double lb, double rb){
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -111,30 +120,23 @@ public class RobotControl {
         rightFrontPower = rf;
         leftBackPower   = lb;
         rightBackPower  = rb;
-    }
-
-    public void defDrive(String mode){
-        if (mode == "forward"){
-            powerDrive(1, 1, 1, 1);
-        }
-    }
+    }*/
 
     public void controllerDrive(double axial, double lateral, double yaw, double mod) {
-        if (mod <= 1) {
-            leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        } else {
-            mod /= 100;
-        }
 
-        leftFrontPower  = axial + lateral + yaw;
-        rightFrontPower = axial - lateral - yaw;
-        leftBackPower   = axial - lateral + yaw;
-        rightBackPower  = axial + lateral - yaw;
+        double theta = Math.atan2(axial, lateral);
+        double power = Math.hypot(axial, lateral);
 
-        double max = 0;
+        double sin = Math.sin(theta - Math.PI / 4);
+        double cos = Math.cos(theta - Math.PI / 4);
+        double mmm = Math.max(Math.abs(sin), Math.abs(cos));
+
+        leftFrontPower  = power * cos / mmm + yaw;
+        rightFrontPower = power * sin / mmm - yaw;
+        leftBackPower   = power * sin / mmm + yaw;
+        rightBackPower  = power * cos / mmm - yaw;
+
+        double max;
         max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
         max = Math.max(max, Math.abs(leftBackPower));
         max = Math.max(max, Math.abs(rightBackPower));
@@ -158,41 +160,21 @@ public class RobotControl {
     }
 
     public void armControl(double power, double cPower){
-        if (power != 0){
-            int validity = 1; /*
-            if (power > 0 && armMotor.getCurrentPosition() < -50){
-                validity = 1;
-            } else if (power < 0 && armMotor.getCurrentPosition() > ARM_HIGH){
-                validity = 1;
-            }*/
-            armMotor.setPower(power * validity);
-            armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            armTarget = armMotor.getCurrentPosition();
-        } else {
-            armMotor.setTargetPosition(armTarget);
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            armMotor.setPower(cPower);
-        }
+            da = armTimer.seconds() < 0.5? armTimer.seconds() : 0;
+            armTimer.reset();
+            armTarget+= 2100.0 * power * da;
+            double armP = navigation.clamp(navigation.calculateArmPIDF(armMotor.getCurrentPosition(), armTarget, extensionMotor.getCurrentPosition(), da), -cPower, cPower);
+            armMotor.setPower(armP);
     }
 
     public void extendControl(double power){
-        if (power != 0){
-            double validity = 0;
-            if (power > 0 && extensionMotor.getCurrentPosition() < -50){
-                validity = Math.min(1, extensionMotor.getCurrentPosition()/-400);
-            } else if (power < 0 && extensionMotor.getCurrentPosition() > MAX_EXTENSION){
-                validity = Math.min(1, (extensionMotor.getCurrentPosition() - MAX_EXTENSION)/400);
-            }
-            extensionMotor.setPower(power * validity);
-            extensionMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            extTarget = extensionMotor.getCurrentPosition();
-        } else if (extensionMotor.getCurrentPosition() < -60 || extTarget < -100) {
-            extensionMotor.setTargetPosition(extTarget);
-            extensionMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            extensionMotor.setPower(1);
-        } else {
-            extensionMotor.setPower(0);
-        }
+        double de = extTimer.seconds() < 0.5? extTimer.seconds() : 0;
+        extTimer.reset();
+        extTarget += 2500.0 * power * de;
+        extTarget = (int) navigation.clamp(extTarget, -2150, 0);
+        armTarget = (int) Math.min(armTarget, extTarget/3.7);
+        double extP = navigation.calculateExtensionPIDF(extensionMotor.getCurrentPosition(), extTarget, armMotor.getCurrentPosition(), de);
+        extensionMotor.setPower(extP);
     }
 
     /*public void rotate (double end, double power){
@@ -224,7 +206,7 @@ public class RobotControl {
             }
         }
         controlOn = 1;
-    } */
+    }
 
     public void DriveToTarget(double tarx, double tary, double tarh, double power){
         controlOn = 0;
@@ -259,9 +241,9 @@ public class RobotControl {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
+    } */
 
-    public void setDriveTargets(int a, int b, int c, int d){
+    /*public void setDriveTargets(int a, int b, int c, int d){
         leftFrontDrive.setTargetPosition(a);
         rightFrontDrive.setTargetPosition(b);
         leftBackDrive.setTargetPosition(c);
@@ -271,20 +253,9 @@ public class RobotControl {
 
     public void targetStop(){
         setDriveTargets(leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
-    }
-
-    public void waitUntilReached(){
-        while (Math.abs(leftFrontDrive.getCurrentPosition() - leftFrontDrive.getTargetPosition()) > 10) {
-
-        }
-    }
+    }*/
 
     public void resetDrive(){
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         leftFrontDrive.setPower(0);
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
