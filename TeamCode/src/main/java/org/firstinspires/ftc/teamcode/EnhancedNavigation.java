@@ -12,20 +12,27 @@ public class EnhancedNavigation {
     private ElapsedTime timer;
 
     // Translation PIDF Constants
-    private static final double TRANSLATION_KP = 0.03;  // Proportional gain for translation
-    private static final double TRANSLATION_KI = 0.003; // Integral gain for translation
-    private static final double TRANSLATION_KD = 0.005;  // Derivative gain for translation
-    private static final double TRANSLATION_KF = 0.05;  // Feed-forward term for translation
+    private static final double TRANSLATION_KP = 0.008;  // Proportional gain for translation
+    private static final double TRANSLATION_KI = 0.00; // Integral gain for translation
+    private static final double TRANSLATION_KD = 0.0008;  // Derivative gain for translation
+    private static final double TRANSLATION_KF = 0.0;  // Feed-forward term for translation
 
     // Rotation PIDF Constants
-    private static final double ROTATION_KP = 0.03;    // Proportional gain for rotation
-    private static final double ROTATION_KI = 0.005;  // Integral gain for rotation
-    private static final double ROTATION_KD = 0.003;    // Derivative gain for rotation
-    private static final double ROTATION_KF = 0.05;     // Feed-forward term for rotation
+    private static final double ROTATION_KP = 0.02;    // Proportional gain for rotation
+    private static final double ROTATION_KI = 0.0;  // Integral gain for rotation
+    private static final double ROTATION_KD = 0.002;    // Derivative gain for rotation
+    private static final double ROTATION_KF = 0.0;     // Feed-forward term for rotation
 
+    private static final double armP = 0.003;
+    private static final double armD = 0.00015;
+    private static final double armF = 0.045;
+
+    private static final double extP = 0.005;
+    private static final double extD = 0.00025;
+    private static final double extF = 0.01;
     // Error thresholds
     private static final double POSITION_TOLERANCE_MM = 50.0;
-    private static final double HEADING_TOLERANCE_DEG = 5.0;
+    private static final double HEADING_TOLERANCE_DEG = 4.0;
 
     // Integral term limits
     private static final double MAX_TRANSLATION_INTEGRAL_ERROR = 200.0;
@@ -41,9 +48,13 @@ public class EnhancedNavigation {
     private double lastXError = 0;
     private double lastYError = 0;
     private double lastHeadingError = 0;
+    private double lastArmError = 0;
+    private double lastExtError =0;
     private double integralXError = 0;
     private double integralYError = 0;
     private double integralHeadingError = 0;
+
+    private double dt;
 
     public EnhancedNavigation(RobotControl robotControl, GoBildaPinpointDriver odometry) {
         this.robot = robotControl;
@@ -60,7 +71,7 @@ public class EnhancedNavigation {
 
         // Get current position
         double currentX = currentPose.getX(DistanceUnit.MM);
-        double currentY = -currentPose.getY(DistanceUnit.MM);
+        double currentY = currentPose.getY(DistanceUnit.MM);
         double currentHeading = -currentPose.getHeading(AngleUnit.DEGREES);
 
         // Calculate errors
@@ -69,7 +80,7 @@ public class EnhancedNavigation {
         double headingError = normalizeAngle(targetHeading - currentHeading);
 
         // Calculate time delta
-        double dt = timer.seconds();
+        dt = timer.seconds();
         timer.reset();
 
         // Calculate derivative terms
@@ -84,7 +95,7 @@ public class EnhancedNavigation {
 
         // Calculate translation PIDF
         double xPower = calculateTranslationPIDF(xError, integralXError, xDerivative);
-        double yPower = calculateTranslationPIDF(yError, integralYError, yDerivative);
+        double yPower = -calculateTranslationPIDF(yError, integralYError, yDerivative);
 
         // Calculate rotation PIDF separately
         double headingPower = calculateRotationPIDF(headingError, integralHeadingError, headingDerivative);
@@ -116,7 +127,7 @@ public class EnhancedNavigation {
         lastHeadingError = headingError;
 
         // Apply motor powers
-        robot.controllerDrive(axialPower, lateralPower, headingPower, 100 * power);
+        robot.controllerDrive(axialPower, lateralPower, headingPower, power);
 
         // Check if target reached
         boolean atPosition = Math.abs(xError) < POSITION_TOLERANCE_MM &&
@@ -129,6 +140,26 @@ public class EnhancedNavigation {
     /**
      * Calculate PIDF output for translation components
      */
+
+    public double calculateArmPIDF(double current,double target, double extendo, double da){
+        double error = target - current;
+        double armDerivate = da > 0 ? (error - lastArmError) / da : 0;
+        lastArmError = error;
+        double armFeedforward = -Math.cos((current + 1200.0) / 4800.0 * Math.PI);
+        armFeedforward *= 1 + (-extendo / 1800.0);
+        return clamp(error * armP + armDerivate * armD + armFeedforward * armF, -1, 1);
+    }
+
+    public double calculateExtensionPIDF(double current,double target,double army, double da){
+        double error = target - current;
+        double extDerivate = da > 0 ? (error - lastExtError) / da : 0;
+        lastExtError = error;
+        double extFeedforward = -Math.sin((army + 900.0)/ 4800.0 * Math.PI);
+        extFeedforward *= 1 + (-current / 1800.0);
+        extFeedforward = Math.max(0, extFeedforward - 1.5);
+        return clamp(error * extP + extDerivate * extD + -extFeedforward * extF, -1, 1);
+    }
+
     private double calculateTranslationPIDF(double error, double integral, double derivative) {
         return TRANSLATION_KP * error +
                 TRANSLATION_KI * integral +
@@ -159,7 +190,7 @@ public class EnhancedNavigation {
     /**
      * Clamp value between min and max
      */
-    private double clamp(double value, double min, double max) {
+    public double clamp(double value, double min, double max) {
         return Math.max(min, Math.min(max, value));
     }
 
