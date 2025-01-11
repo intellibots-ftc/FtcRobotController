@@ -23,6 +23,8 @@ public class Code_Z extends LinearOpMode {
     private final double BASKET_Y = robot.BASKET_Y_TELE;  // Using constant from RobotControl
     private static final double BASKET_HEADING = -40.0;
 
+    private int blonc = -235;
+
     private double navX = 0;
     private double navY = 0;
     private double navH = 0;// Degrees
@@ -58,11 +60,14 @@ public class Code_Z extends LinearOpMode {
             }
             if (gamepad1.x && !isNavigating) {
                 isNavigating = true;
-                navX = -400;
+                odo.update();
+                if(odo.getPosY() > -400){
+                navX = -630;
                 navY = -400;
                 navH = 90;
-                robot.armTarget = -2050;
-                navigation.resetController(); // Reset the PIDF controller
+                robot.armTarget = -2050;}
+                else{navX = -780; navY = odo.getPosY(); navH = 90; robot.armTarget = -1630;}// Reset the PIDF controller
+                navigation.resetController();
             }
             if (gamepad1.a && !isNavigating) {
                 isNavigating = true;
@@ -111,7 +116,11 @@ public class Code_Z extends LinearOpMode {
                 robot.extTarget = robot.MAX_EXTENSION;
             }
             if (gamepad1.dpad_down) {
-                robot.armTarget = -1000;
+                if(robot.armMotor.getCurrentPosition() < -600){
+                    robot.armTarget = -1000;
+                } else {
+                    robot.armTarget = -650;
+                }
                 robot.extTarget = 0;
             }
             if (gamepad1.dpad_right){
