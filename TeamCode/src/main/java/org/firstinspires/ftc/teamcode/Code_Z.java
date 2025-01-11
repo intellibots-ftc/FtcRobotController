@@ -16,12 +16,16 @@ public class Code_Z extends LinearOpMode {
     private EnhancedNavigation navigation;
     private double mod = 1;
     private double slow = 1;
-    private boolean isNavigatingToBasket = false;
+    private boolean isNavigating = false;
 
     // Basket coordinates (adjust these based on your field setup)
     private final double BASKET_X = robot.BASKET_X_TELE;  // Using constant from RobotControl
     private final double BASKET_Y = robot.BASKET_Y_TELE;  // Using constant from RobotControl
-    private static final double BASKET_HEADING = -45.0;  // Degrees
+    private static final double BASKET_HEADING = -40.0;
+
+    private double navX = 0;
+    private double navY = 0;
+    private double navH = 0;// Degrees
 
     @Override
     public void runOpMode() {
@@ -32,10 +36,10 @@ public class Code_Z extends LinearOpMode {
 
         // Initialize odometry
         odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-        odo.setOffsets(8.0, -168.0);
+        odo.setOffsets(6.25, -168.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
-        odo.resetPosAndIMU();
+        //odo.resetPosAndIMU();
 
         // Initialize navigation system
         navigation = new EnhancedNavigation(robot, odo);
@@ -45,23 +49,41 @@ public class Code_Z extends LinearOpMode {
 
         while (opModeIsActive()) {
             // Handle automatic basket navigation when dpad_left is pressed
-            if (gamepad1.dpad_left && !isNavigatingToBasket) {
-                isNavigatingToBasket = true;
+            if (gamepad1.dpad_left && !isNavigating) {
+                isNavigating = true;
+                navX = BASKET_X;
+                navY = BASKET_Y;
+                navH = BASKET_HEADING;
+                navigation.resetController(); // Reset the PIDF controller
+            }
+            if (gamepad1.x && !isNavigating) {
+                isNavigating = true;
+                navX = -400;
+                navY = -400;
+                navH = 90;
+                robot.armTarget = -2050;
+                navigation.resetController(); // Reset the PIDF controller
+            }
+            if (gamepad1.a && !isNavigating) {
+                isNavigating = true;
+                navX = -1300;
+                navY = -400;
+                navH = -90;
+                robot.armTarget = -900;
                 navigation.resetController(); // Reset the PIDF controller
             }
 
-            if (isNavigatingToBasket) {
+            if (isNavigating) {
                 // Use enhanced navigation to move to basket position
-                boolean atTarget = navigation.navigateToPosition(BASKET_X, BASKET_Y, BASKET_HEADING, 0.8);
+                boolean atTarget = navigation.navigateToPosition(navX, navY, navH, 1);
                 if (atTarget) {
-                    isNavigatingToBasket = false;
-                    robot.controlOn = 1;
-                    robot.targetStop();// Re-enable manual control
+                    isNavigating = false;
+                    robot.controlOn = 1;// Re-enable manual control
                 }
 
                 // Allow cancellation of automatic navigation with dpad_right
                 if (gamepad1.dpad_right) {
-                    isNavigatingToBasket = false;
+                    isNavigating = false;
                     robot.controlOn = 1;
                 }
             } else {
@@ -71,15 +93,8 @@ public class Code_Z extends LinearOpMode {
                 double yaw = gamepad1.right_stick_x;
 
                 // Apply deadband
-                if (Math.abs(axial) < 0.15) axial = 0;
-                if (Math.abs(lateral) < 0.15) lateral = 0;
 
-                if (robot.controlOn == 1) {
-                    robot.controllerDrive(axial, lateral, yaw, mod);
-                } else if (axial != 0 || lateral != 0 || yaw != 0) {
-                    robot.controllerDrive(axial, lateral, yaw, mod);
-                    robot.controlOn = 1;
-                }
+                robot.controllerDrive(axial, lateral, yaw, mod);
             }
 
             // Speed control
@@ -96,8 +111,14 @@ public class Code_Z extends LinearOpMode {
                 robot.extTarget = robot.MAX_EXTENSION;
             }
             if (gamepad1.dpad_down) {
-                robot.armTarget = -1500;
-                robot.extTarget = -50;
+                robot.armTarget = -1000;
+                robot.extTarget = 0;
+            }
+            if (gamepad1.dpad_right){
+                robot.extTarget = 0;
+                if(robot.extensionMotor.getCurrentPosition() > -50){
+                    robot.armTarget = -4300;
+                }
             }
 
             // Manual arm control
@@ -111,9 +132,9 @@ public class Code_Z extends LinearOpMode {
 
             // Intake control
             if (gamepad1.right_trigger > 0) {
-                robot.intakeServo.setPower(1);
+                robot.intakeServo.setPower(-1);
             } else if (gamepad1.left_trigger > 0) {
-                robot.intakeServo.setPower(-0.5);
+                robot.intakeServo.setPower(0.5);
             } else if (gamepad1.left_stick_button) {
                 robot.intakeServo.setPower(0);
             }
@@ -129,9 +150,9 @@ public class Code_Z extends LinearOpMode {
 
             // Intake rotator control
             if (gamepad1.x) {
-                robot.intakeRotatorServo.setPosition(0.1666);
+                //robot.intakeRotatorServo.setPosition(0.1666);
             } else if (gamepad1.a) {
-                robot.intakeRotatorServo.setPosition(0.8333);
+                //robot.intakeRotatorServo.setPosition(0.8333);
             } else {
                 robot.intakeRotatorServo.setPosition(0.5);
             }
@@ -151,7 +172,7 @@ public class Code_Z extends LinearOpMode {
             telemetry.addData("Extension motor target", robot.extTarget);
             telemetry.addData("Arm motor position", robot.armMotor.getCurrentPosition());
             telemetry.addData("Arm motor target", robot.armTarget);
-            if (isNavigatingToBasket) {
+            if (isNavigating) {
                 telemetry.addData("Navigation", "Moving to Basket");
             }
             telemetry.update();
