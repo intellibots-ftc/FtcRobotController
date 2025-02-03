@@ -34,14 +34,15 @@ public class RobotControl {
     public static final double TICKS_PER_MM = 1;
     public static final double BASKET_X_AUTO = 0;
     public static final double BASKET_Y_AUTO = 0;
-    public static final double BASKET_X_TELE = 940;
-    public static final double BASKET_Y_TELE = -230;
+    public static final double BASKET_X_TELE = 920;
+    public static final double BASKET_Y_TELE = -260;
 
     private double leftFrontPower  = 0;
     public int controlOn = 1;
     private double rightFrontPower = 0;
     private double leftBackPower   = 0;
     private double rightBackPower  = 0;
+    private double maxExtThing = 0;
     public int armTarget;
     public int extTarget;
     private ElapsedTime armTimer;
@@ -49,6 +50,7 @@ public class RobotControl {
     private GoBildaPinpointDriver odo;
     private EnhancedNavigation navigation;
     public double da;
+    public boolean isTeleop = false;
 
     // Define a constructor that allows the OpMode to pass a reference to itself.
     public RobotControl (LinearOpMode opmode) {
@@ -164,6 +166,13 @@ public class RobotControl {
             armTimer.reset();
             armTarget+= 2100.0 * power * da;
             double armP = navigation.clamp(navigation.calculateArmPIDF(armMotor.getCurrentPosition(), armTarget, extensionMotor.getCurrentPosition(), da), -cPower, cPower);
+            if (isTeleop) {
+                double xi = armTarget > -1200 && armTarget < -500? ((armTarget + 300) / 3000.) +0.6 :1;
+                myOpMode.telemetry.addData("xi", xi);
+                intakeRotatorServo.setPosition(xi);
+            } else {
+                intakeRotatorServo.setPosition(1);
+            }
             armMotor.setPower(armP);
     }
 
@@ -172,7 +181,9 @@ public class RobotControl {
         extTimer.reset();
         extTarget += 2500.0 * power * de;
         extTarget = (int) navigation.clamp(extTarget, -2150, 0);
-        armTarget = (int) Math.min(armTarget, Math.max(-(160+Math.pow(-extTarget, 0.8)), -600));
+        if(extTarget < -200 || armTarget < armMotor.getCurrentPosition()) {
+            armTarget = (int) Math.min(armTarget, Math.max(-(200+Math.pow(-extTarget, 0.8)), -640));
+        }
         double extP = navigation.calculateExtensionPIDF(extensionMotor.getCurrentPosition(), extTarget, armMotor.getCurrentPosition(), de);
         extensionMotor.setPower(extP);
     }
@@ -263,6 +274,6 @@ public class RobotControl {
     }
 
     public void positionServo() {
-        intakeRotatorServo.setPosition(0.5);
+        intakeRotatorServo.setPosition(1);
     }
 }
