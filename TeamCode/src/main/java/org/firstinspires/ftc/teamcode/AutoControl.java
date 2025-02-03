@@ -35,15 +35,20 @@ public class AutoControl {
 
     public double skibidi = 1.0;
 
-    public double specArmTarget = -1950;
+    public double specArmTarget = -2050;
+    public double weird = 0.6;
+    private boolean isTeleOp = false;
 
 
     // Timeouts
     public double NAVIGATION_TIMEOUT = 5.0;  // seconds
     private static final double SCORING_TIMEOUT = 1.5;  // seconds
     private static final double COLLECTION_TIMEOUT = 1.5;
+    public double wallWait = 1.0;
 
     private static double cPower = 1;// seconds
+    private static final double specArmAdjust = -150;
+
 
     public AutoControl (LinearOpMode opmode) {
         myOpMode = opmode;
@@ -65,6 +70,7 @@ public class AutoControl {
 
     public void setup(){
         robot.positionServo();
+        robot.armTarget = -1000;
         robot.controllerDrive(0, 1, 0, 1);
     }
 
@@ -139,44 +145,98 @@ public class AutoControl {
     }
 
     public void goToChamber(double specimen_X){
-        robot.armTarget = (int) specArmTarget;
+        robot.armTarget = (int) ( specArmTarget + specArmAdjust);
         robot.extTarget = 0;
 
-        specimen_X = navigation.clamp(specimen_X, -500, -300);
-        moveTo(specimen_X, -400, 90, power, 2, 1);
+        specimen_X = navigation.clamp(specimen_X, -500, -220);
+        moveTo(specimen_X, -400, 90, weird, 2, 1);
     }
 
     public void scoreSpecimen(){
+        robot.intakeServo.setPower(0);
         moveTo(odo.getPosX(), -630, 90, power, NAVIGATION_TIMEOUT, 1);
-        robot.armTarget = -1630;
+        robot.armTarget = (int) (-1630 + specArmAdjust);
         //power = 0.8;
-        moveTo(odo.getPosX(), -780, 90, power, NAVIGATION_TIMEOUT, 1);
+        moveTo(odo.getPosX(), -800, 90, power, NAVIGATION_TIMEOUT, 1);
         robot.intakeServo.setPower(0.5);
-        moveTo(odo.getPosX(), -400, 90, power, NAVIGATION_TIMEOUT, 1);
+        ElapsedTime timer = new ElapsedTime();
+        while(timer.seconds() < 0.2){
+            robot.controllerDrive(-1, 0, 0, 1);
+        }
     }
 
     public void grabFromWall(){
-        moveTo(odo.getPosX() + 100, -500, 0, power, 1, 1);
-        robot.armTarget = -1200;
-        robot.intakeServo.setPower(-0.5);
-        moveTo(-1300, -310, -90, power, skibidi, 1);
-        robot.armTarget = -820;
-        wait(1.0);
+        double bing = odo.getPosX() < -1000? odo.getPosX() + 100 : -650;
+        moveTo(bing, -330, (180 * Math.signum(bing + 650)) + 180, weird, 1, 1);
+        robot.armTarget = (int) (-900 + specArmAdjust);
+        robot.intakeServo.setPower(-1);
+        moveTo(-1300, -310, -90, weird, skibidi, 1);
+        wait(wallWait);
         moveTo(-1300, -150, -90, power, 1.5, 1);
+    }
+    public void specimenFive(){
+        double place = -1950;
+        moveTo(place + 250, -1250, -90, weird, NAVIGATION_TIMEOUT, 1);
+        moveTo(place, -1250, -90, weird, NAVIGATION_TIMEOUT, 1);
+        robot.intakeServo.setPower(-1);
+        robot.armTarget = (int) (-900 + specArmAdjust);
+        moveTo(place, -200, -90, weird, NAVIGATION_TIMEOUT, 1);
     }
 
     public void pushSpikeMark(double specX){
-        moveTo(specX + 250, -500, 90, power, NAVIGATION_TIMEOUT, 1);
-        moveTo(specX + 250, -1300, 90, power, NAVIGATION_TIMEOUT, 1);
-        moveTo(specX, -1300, 90, power, NAVIGATION_TIMEOUT, 1);
-        moveTo(specX, -350, 90, power, NAVIGATION_TIMEOUT, 1);
+        moveTo(specX + 250, -500, 90, weird, NAVIGATION_TIMEOUT, 1);
+        moveTo(specX + 250, -1250, 90, weird, NAVIGATION_TIMEOUT, 1);
+        moveTo(specX, -1250, 90, weird, NAVIGATION_TIMEOUT, 1);
+        moveTo(specX, -350, 90, weird, NAVIGATION_TIMEOUT, 1);
+    }
+
+    public void moveToBasket_Teleop(double x, double y, double h){
+        if(odo.getPosY() < y - 1000 && odo.getPosX() < x - 400) {
+            robot.armTarget = -600;
+            robot.extTarget = 0;
+            moveTo(x - 400, y-1200, -odo.getHeading(), 1, 5, 1);
+        }
+        robot.armTarget = ARM_SCORING;
+        robot.extTarget = -2100;
+        moveTo(x, y, h, 1, 5, 1);
+    }
+
+    public void dropOffSample(){
+        if(odo.getPosY() < -900){
+            robot.extTarget = 0;
+            robot.armTarget = -900;
+            robot.intakeRotatorServo.setPosition(1);
+            robot.intakeServo.setPower(-0.1);
+            moveTo(-1500, odo.getPosY(), 0, 1, 5, 1);
+            robot.extTarget = -1500;
+            moveTo(odo.getPosX(), -800, -90, 1, 5, 1);
+            robot.intakeServo.setPower(0.5);
+        } else if (odo.getPosX() < 0){
+            robot.extTarget = 0;
+            robot.armTarget = -600;
+            robot.intakeRotatorServo.setPosition(1);
+            robot.intakeServo.setPower(-0.1);
+            moveTo(odo.getPosX(), -650, 90, 1, 5, 1);
+            robot.armTarget = -900;
+            moveTo(odo.getPosX(), -400, 90, 1, 5, 1);
+            robot.extTarget = -1500;
+            moveTo(-800, -200, 180, 1, 5, 1);
+            robot.intakeServo.setPower(0.5);}
     }
 
     public void moveTo(double x, double y, double h, double p, double t, double c){
         navigation.resetController();
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
+        if(isTeleOp){
+            t = 5;
+        }
         while (myOpMode.opModeIsActive() && timer.seconds() < t) {
+            if(isTeleOp){
+                if(myOpMode.gamepad1.right_stick_button){
+                    break;
+                }
+            }
             if (navigation.navigateToPosition(x, y, h, p)) {
                 break;
             }
@@ -191,8 +251,22 @@ public class AutoControl {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         while (myOpMode.opModeIsActive() && timer.seconds() < t) {
+            if(isTeleOp){
+                if(myOpMode.gamepad1.right_stick_button){
+                    break;
+                }
+            }
             robot.armControl(0, 1);
             robot.extendControl(0);
         }
+    }
+
+    public void teleopInitialize(RobotControl r, GoBildaPinpointDriver o, EnhancedNavigation n){
+        robot = r;
+        odo = o;
+        navigation = n;
+        isTeleOp = true;
+        power = 1;
+        weird = 1;
     }
 }
