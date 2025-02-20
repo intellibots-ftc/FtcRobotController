@@ -34,11 +34,14 @@ public class Code_Z extends LinearOpMode {
     double basketXError = BASKET_X;
     double basketYError = BASKET_Y;
     double basketHError = BASKET_HEADING;
+    boolean spinnerState = false; // Initialize state: false = position 0.16, true = position 0.5
+    boolean xButtonPressed = false; // Track if button X was pressed in the previous loop
 
     @Override
     public void runOpMode() {
         // Initialize robot hardware
         robot.init();
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -57,7 +60,9 @@ public class Code_Z extends LinearOpMode {
 
         waitForStart();
         runtime.reset();
-        robot.intakeRotatorServo.setPosition(1);
+
+        robot.armTarget = -1000;
+        robot.intakeRotatorServo.setPosition(0.28);
 
         while (opModeIsActive()) {
             // Handle automatic basket navigation when dpad_left is pressed
@@ -70,24 +75,24 @@ public class Code_Z extends LinearOpMode {
                 navigation.resetController();
                 auto.moveToBasket_Teleop(basketXError, basketYError, basketHError);// Reset the PIDF controller
             }
-            if (gamepad1.x) {
-                navigation.resetController();
-                odo.update();
-                if(specPhase == 1){
-                    /*navX = -400;
-                    navY = -630;
-                    navH = 90;
-                    robot.armTarget = -2050;*/
-                    auto.goToChamber(-400);
-                    specPhase = 2;
-                } else if (specPhase == 0) {
-                    auto.grabFromWall();
-                    specPhase = 1;
-                } else {/*navX = odo.getPosX(); navY = -780; navH = 90; robot.armTarget = -1630;*/
-                    auto.scoreSpecimen();
-                    specPhase = 0;
-                }// Reset the PIDF controller
-            }
+//            if (gamepad1.x) {
+//                navigation.resetController();
+//                odo.update();
+//                if(specPhase == 1){
+//                    /*navX = -400;
+//                    navY = -630;
+//                    navH = 90;
+//                    robot.armTarget = -2050;*/
+//                    auto.goToChamber(-400);
+//                    specPhase = 2;
+//                } else if (specPhase == 0) {
+//                    auto.grabFromWall();
+//                    specPhase = 1;
+//                } else {/*navX = odo.getPosX(); navY = -780; navH = 90; robot.armTarget = -1630;*/
+//                    auto.scoreSpecimen();
+//                    specPhase = 0;
+//                }// Reset the PIDF controller
+//            }
             if (gamepad1.a) {
                 /*isNavigating = true;
                 navX = -1300;
@@ -123,11 +128,10 @@ public class Code_Z extends LinearOpMode {
 
             // Arm control
             if (gamepad1.dpad_up) {
-                bing = !robot.isTeleop;
+                robot.armTarget = robot.ARM_HIGH;
+                robot.extTarget = robot.MAX_EXTENSION;
             }
-            if (!gamepad1.dpad_up) {
-                robot.isTeleop = bing;
-            }
+
             if (gamepad1.dpad_down) {
                 if(robot.armMotor.getCurrentPosition() < -600){
                     robot.armTarget = -1000;
@@ -152,15 +156,18 @@ public class Code_Z extends LinearOpMode {
                 robot.armControl(0, 1);
             }
 
+            int upper_limit = robot.extensionMotor.getCurrentPosition() < -1500 ? -1000 : -700;
+            double xi = robot.armTarget > upper_limit && robot.armTarget < -100 ? 0.6 :0.28;
+            robot.myOpMode.telemetry.addData("xi", xi);
+            robot.intakeRotatorServo.setPosition(xi);
+
             // Intake control
             if (gamepad1.right_trigger > 0) {
-                robot.intakeServo.setPower(-1);
-            } else if (gamepad1.left_trigger > 0) {
-                robot.intakeServo.setPower(1);
-            } else if (gamepad1.left_stick_button) {
-                robot.intakeServo.setPower(0);
-            }
+                robot.intakeServoGrip.setPosition(0.15); // gripper abs open position
 
+            } else if (gamepad1.left_trigger > 0) {
+                robot.intakeServoGrip.setPosition(0.3433); // gripper abs closed position
+            }
             // Extension control
             if (gamepad1.right_bumper && robot.extensionMotor.getCurrentPosition() > robot.MAX_EXTENSION) {
                 robot.extendControl(-mod);
@@ -170,14 +177,24 @@ public class Code_Z extends LinearOpMode {
                 robot.extendControl(0);
             }
 
-            // Intake rotator control
+
+            // ... inside your while (opModeIsActive()) loop ...
+
             if (gamepad1.x) {
-                //robot.intakeRotatorServo.setPosition(0.1666);
-            } else if (gamepad1.a) {
-                //robot.intakeRotatorServo.setPosition(0.8333);
+                if (!xButtonPressed) { // Detect button press event (not just button hold)
+                    spinnerState = !spinnerState; // Toggle the state
+
+                    if (spinnerState) {
+                        robot.intakeServoSpinner.setPosition(0.5); // spinner abs middle orientaiton 0.5 extended (using 0.5 based on your comment "abs middle orientaiton 0.5")
+                    } else {
+                        robot.intakeServoSpinner.setPosition(0.84); // spinner abs up orientaiton 0.16
+                    }
+                    xButtonPressed = true; // Remember button is now pressed
+                }
             } else {
-                //robot.intakeRotatorServo.setPosition(1);
+                xButtonPressed = false; // Reset button pressed flag when button is released
             }
+
 
             // Update odometry and telemetry
             odo.update();

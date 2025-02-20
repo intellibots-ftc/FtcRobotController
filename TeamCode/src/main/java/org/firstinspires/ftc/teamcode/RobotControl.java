@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -15,7 +16,7 @@ import java.util.Locale;
 public class RobotControl {
 
     /* Declare OpMode members. */
-    private LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
+    public LinearOpMode myOpMode = null;   // gain access to methods in the calling OpMode.
 
     // Define Motor and Servo objects  (Make them private so they can't be accessed externally)
     private DcMotor leftFrontDrive = null;
@@ -24,7 +25,10 @@ public class RobotControl {
     private DcMotor rightBackDrive = null;
     public DcMotor armMotor = null;
     public DcMotor extensionMotor=null;
-    public CRServo intakeServo =null;
+    public CRServo intakeServo=null;
+    public Servo intakeServoGrip=null;
+
+    public Servo intakeServoSpinner=null;
     public Servo intakeRotatorServo=null;
 
     public static final double ARM_HANG_POS = -1500;
@@ -75,8 +79,10 @@ public class RobotControl {
         rightBackDrive = myOpMode.hardwareMap.get(DcMotor.class, "right_back_drive");
         armMotor   = myOpMode.hardwareMap.get(DcMotor.class, "arm_motor");
         extensionMotor   = myOpMode.hardwareMap.get(DcMotor.class, "extension_motor");
+        intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servoCR");
+        intakeServoGrip = myOpMode.hardwareMap.get(Servo.class, "intake_servo");
+        intakeServoSpinner = myOpMode.hardwareMap.get(Servo.class, "servo_spinner");
         intakeRotatorServo = myOpMode.hardwareMap.get(Servo.class, "intake_rotator_servo");
-        intakeServo = myOpMode.hardwareMap.get(CRServo.class, "intake_servo");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
@@ -94,7 +100,10 @@ public class RobotControl {
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        intakeServo.setDirection(DcMotor.Direction.REVERSE);
+        intakeServo.setDirection(CRServo.Direction.REVERSE);
+        intakeServoGrip.setDirection(Servo.Direction.REVERSE);
+        intakeServoSpinner.setDirection(Servo.Direction.REVERSE);
+        intakeRotatorServo.setDirection(Servo.Direction.REVERSE);
 
         myOpMode.telemetry.addData(">", "Hardware Initialized");
         myOpMode.telemetry.update();
@@ -162,18 +171,18 @@ public class RobotControl {
     }
 
     public void armControl(double power, double cPower){
-            da = armTimer.seconds() < 0.5? armTimer.seconds() : 0;
-            armTimer.reset();
-            armTarget+= 2100.0 * power * da;
-            double armP = navigation.clamp(navigation.calculateArmPIDF(armMotor.getCurrentPosition(), armTarget, extensionMotor.getCurrentPosition(), da), -cPower, cPower);
-            if (isTeleop) {
-                double xi = armTarget > -1200 && armTarget < -500? ((armTarget + 300) / 3000.) +0.6 :1;
-                myOpMode.telemetry.addData("xi", xi);
-                intakeRotatorServo.setPosition(xi);
-            } else {
-                intakeRotatorServo.setPosition(1);
-            }
-            armMotor.setPower(armP);
+        da = armTimer.seconds() < 0.5? armTimer.seconds() : 0;
+        armTimer.reset();
+        armTarget+= 2100.0 * power * da;
+        double armP = navigation.clamp(navigation.calculateArmPIDF(armMotor.getCurrentPosition(), armTarget, extensionMotor.getCurrentPosition(), da), -cPower, cPower);
+        if (isTeleop) {
+          //  double xi = armTarget > -1200 && armTarget < -500 ? 0.5 :0.28;
+          //  myOpMode.telemetry.addData("xi", xi);
+            //intakeRotatorServo.setPosition(xi);
+        } else {
+            intakeRotatorServo.setPosition(0.28);
+        }
+        armMotor.setPower(armP);
     }
 
     public void extendControl(double power){
@@ -265,6 +274,19 @@ public class RobotControl {
     public void targetStop(){
         setDriveTargets(leftFrontDrive.getCurrentPosition(), rightFrontDrive.getCurrentPosition(), leftBackDrive.getCurrentPosition(), rightBackDrive.getCurrentPosition());
     }*/
+
+
+    public void testServos(double servoIncrement)
+    {
+        // Increment by one degree (assuming range 0-1 maps to 0-180 degrees)
+        double newIntakePos = Range.clip(intakeServoGrip.getPosition() + servoIncrement, 0, 1);
+        double newSpinnerPos = Range.clip(intakeServoSpinner.getPosition() + servoIncrement, 0, 1);
+        double newRotatorPos = Range.clip(intakeRotatorServo.getPosition() + servoIncrement, 0, 1);
+
+//        intakeServoGrip.setPosition(newIntakePos);
+//        intakeServoSpinner.setPosition(newSpinnerPos);
+        intakeRotatorServo.setPosition(newRotatorPos);
+    }
 
     public void resetDrive(){
         leftFrontDrive.setPower(0);
