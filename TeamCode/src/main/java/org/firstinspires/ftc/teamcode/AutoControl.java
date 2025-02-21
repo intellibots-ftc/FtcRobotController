@@ -145,6 +145,8 @@ public class AutoControl {
     }
 
     public void goToChamber(double specimen_X){
+        robot.intakeServoGrip.setPosition(0.15);
+        robot.intakeRotatorServo.setPosition(0.26);
         robot.armTarget = (int) ( specArmTarget + specArmAdjust);
         robot.extTarget = 0;
 
@@ -153,12 +155,13 @@ public class AutoControl {
     }
 
     public void scoreSpecimen(){
-        robot.intakeServo.setPower(0);
+        //robot.intakeServo.setPower(0);
         moveTo(odo.getPosX(), -630, 90, power, NAVIGATION_TIMEOUT, 1);
-        robot.armTarget = (int) (-1630 + specArmAdjust);
+        robot.armTarget = (int) (-1200 + specArmAdjust);
         //power = 0.8;
         moveTo(odo.getPosX(), -800, 90, power, NAVIGATION_TIMEOUT, 1);
-        robot.intakeServo.setPower(0.5);
+        //robot.intakeServo.setPower(0.5);
+        robot.intakeServoGrip.setPosition(0.3433);
         ElapsedTime timer = new ElapsedTime();
         while(timer.seconds() < 0.2){
             robot.controllerDrive(-1, 0, 0, 1);
@@ -169,18 +172,21 @@ public class AutoControl {
         double bing = odo.getPosX() < -1000? odo.getPosX() + 100 : -650;
         moveTo(bing, -330, (180 * Math.signum(bing + 650)) + 180, weird, 1, 1);
         robot.armTarget = (int) (-900 + specArmAdjust);
-        robot.intakeServo.setPower(-1);
+        //robot.intakeServo.setPower(-1);
         moveTo(-1300, -310, -90, weird, skibidi, 1);
         wait(wallWait);
         moveTo(-1300, -150, -90, power, 1.5, 1);
+        robot.intakeServoGrip.setPosition(0.15);
     }
     public void specimenFive(){
         double place = -1950;
         moveTo(place + 250, -1250, -90, weird, NAVIGATION_TIMEOUT, 1);
         moveTo(place, -1250, -90, weird, NAVIGATION_TIMEOUT, 1);
-        robot.intakeServo.setPower(-1);
+        //robot.intakeServo.setPower(-1);
         robot.armTarget = (int) (-900 + specArmAdjust);
+        moveTo(place, -400, -90, weird, NAVIGATION_TIMEOUT, 1);
         moveTo(place, -200, -90, weird, NAVIGATION_TIMEOUT, 1);
+        robot.intakeServoGrip.setPosition(0.15);
     }
 
     public void pushSpikeMark(double specX){
@@ -198,6 +204,7 @@ public class AutoControl {
         }
         robot.armTarget = ARM_SCORING;
         robot.extTarget = -2100;
+        robot.intakeRotatorServo.setPosition(0.26);
         moveTo(x, y, h, 1, 5, 1);
     }
 
@@ -205,23 +212,28 @@ public class AutoControl {
         if(odo.getPosY() < -900){
             robot.extTarget = 0;
             robot.armTarget = -900;
-            robot.intakeRotatorServo.setPosition(1);
+            //robot.intakeRotatorServo.setPosition(1);
+            robot.intakeRotatorServo.setPosition(0.26);
             robot.intakeServo.setPower(-0.1);
             moveTo(-1500, odo.getPosY(), 0, 1, 5, 1);
             robot.extTarget = -1500;
-            moveTo(odo.getPosX(), -800, -90, 1, 5, 1);
-            robot.intakeServo.setPower(0.5);
+            moveTo(odo.getPosX(), -600, -90, 1, 5, 1);
+            //robot.intakeServo.setPower(0.5);
+            robot.intakeServoGrip.setPosition(0.3433);
         } else if (odo.getPosX() < 0){
             robot.extTarget = 0;
             robot.armTarget = -600;
-            robot.intakeRotatorServo.setPosition(1);
+            //robot.intakeRotatorServo.setPosition(1);
+            robot.intakeRotatorServo.setPosition(0.26);
             robot.intakeServo.setPower(-0.1);
             moveTo(odo.getPosX(), -650, 90, 1, 5, 1);
             robot.armTarget = -900;
             moveTo(odo.getPosX(), -400, 90, 1, 5, 1);
             robot.extTarget = -1500;
-            moveTo(-800, -200, 180, 1, 5, 1);
-            robot.intakeServo.setPower(0.5);}
+            moveTo(-1000, -200, 180, 1, 5, 1);
+            //robot.intakeServo.setPower(0.5);
+            robot.intakeServoGrip.setPosition(0.3433);
+        }
     }
 
     public void moveTo(double x, double y, double h, double p, double t, double c){
