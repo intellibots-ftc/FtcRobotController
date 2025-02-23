@@ -76,22 +76,22 @@ public class Code_Z extends LinearOpMode {
                 navigation.resetController();
                 auto.moveToBasket_Teleop(basketXError, basketYError, basketHError);// Reset the PIDF controller
             }
-//            if (gamepad1.x) {
-//                navigation.resetController();
-//                odo.update();
-//                if(specPhase == 1){
-//                    /*navX = -400;
+            if (gamepad2.x) {
+                navigation.resetController();
+                odo.update();
+                if(specPhase == 1){
+                    /*navX = -400;
 //                    navY = -630;
 //                    navH = 90;
 //                    robot.armTarget = -2050;*/
-//                    auto.goToChamber(-400);
-//                    specPhase = 2;
-//                } else if (specPhase == 0) {
-//                    auto.grabFromWall();
-//                    specPhase = 1;
-//                } else {/*navX = odo.getPosX(); navY = -780; navH = 90; robot.armTarget = -1630;*/
-//                    auto.scoreSpecimen();
-//                    specPhase = 0;
+                    auto.goToChamber(-400);
+                    specPhase = 2;
+                } else if (specPhase == 0) {
+                    auto.grabFromWall();
+                    specPhase = 1;
+                } else {/*navX = odo.getPosX(); navY = -780; navH = 90; robot.armTarget = -1630;*/
+                    auto.scoreSpecimen();
+                    specPhase = 0;
 //                }// Reset the PIDF controller
 //            }
             if (gamepad1.a) {
@@ -131,6 +131,7 @@ public class Code_Z extends LinearOpMode {
             if (gamepad1.dpad_up) {
                 robot.armTarget = robot.ARM_HIGH;
                 robot.extTarget = robot.MAX_EXTENSION;
+                isDown = false;
                 robot.intakeRotatorServo.setPosition(0.5);
             }
 
@@ -158,7 +159,7 @@ public class Code_Z extends LinearOpMode {
                 robot.armControl(0, 1);
             }
 
-            if (isDown && robot.armMotor.getCurrentPosition() > -2000){
+            if (isDown){
                 int upper_limit = robot.extensionMotor.getCurrentPosition() < -1500 ? -1200 : -1000;
                 double xi = robot.armTarget > upper_limit && robot.armTarget < -100 ? 0.6 :0.28;
                 robot.myOpMode.telemetry.addData("xi", xi);
