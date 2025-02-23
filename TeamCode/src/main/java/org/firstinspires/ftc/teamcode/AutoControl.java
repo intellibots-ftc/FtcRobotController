@@ -35,7 +35,7 @@ public class AutoControl {
 
     public double skibidi = 1.0;
 
-    public double specArmTarget = -2050;
+    public double specArmTarget = -2100;
     public double weird = 0.6;
     private boolean isTeleOp = false;
 
@@ -47,7 +47,7 @@ public class AutoControl {
     public double wallWait = 1.0;
 
     private static double cPower = 1;// seconds
-    private static final double specArmAdjust = -150;
+    private static final double specArmAdjust = 50;
 
 
     public AutoControl (LinearOpMode opmode) {
@@ -157,7 +157,7 @@ public class AutoControl {
     public void scoreSpecimen(){
         //robot.intakeServo.setPower(0);
         moveTo(odo.getPosX(), -630, 90, power, NAVIGATION_TIMEOUT, 1);
-        robot.armTarget = (int) (-1200 + specArmAdjust);
+        robot.armTarget = (int) (-1300 + specArmAdjust);
         //power = 0.8;
         moveTo(odo.getPosX(), -800, 90, power, NAVIGATION_TIMEOUT, 1);
         //robot.intakeServo.setPower(0.5);
@@ -171,7 +171,7 @@ public class AutoControl {
     public void grabFromWall(){
         double bing = odo.getPosX() < -1000? odo.getPosX() + 100 : -650;
         moveTo(bing, -330, (180 * Math.signum(bing + 650)) + 180, weird, 1, 1);
-        robot.armTarget = (int) (-900 + specArmAdjust);
+        robot.armTarget = (int) (-800 + specArmAdjust);
         //robot.intakeServo.setPower(-1);
         moveTo(-1300, -310, -90, weird, skibidi, 1);
         wait(wallWait);
@@ -179,13 +179,14 @@ public class AutoControl {
         robot.intakeServoGrip.setPosition(0.15);
     }
     public void specimenFive(){
+        
         double place = -1950;
         moveTo(place + 250, -1250, -90, weird, NAVIGATION_TIMEOUT, 1);
         moveTo(place, -1250, -90, weird, NAVIGATION_TIMEOUT, 1);
         //robot.intakeServo.setPower(-1);
-        robot.armTarget = (int) (-900 + specArmAdjust);
-        moveTo(place, -400, -90, weird, NAVIGATION_TIMEOUT, 1);
-        moveTo(place, -200, -90, weird, NAVIGATION_TIMEOUT, 1);
+        robot.armTarget = (int) (-800 + specArmAdjust);
+        moveTo(place, -500, -90, weird, NAVIGATION_TIMEOUT, 1);
+        moveTo(place, -120, -90, weird, NAVIGATION_TIMEOUT, 1);
         robot.intakeServoGrip.setPosition(0.15);
     }
 
