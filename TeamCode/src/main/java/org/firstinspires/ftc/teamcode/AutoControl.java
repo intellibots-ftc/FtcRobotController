@@ -43,7 +43,7 @@ public class AutoControl {
     // Timeouts
     public double NAVIGATION_TIMEOUT = 5.0;  // seconds
     private static final double SCORING_TIMEOUT = 1.5;  // seconds
-    private static final double COLLECTION_TIMEOUT = 1.5;
+    private static final double COLLECTION_TIMEOUT = 0.5;
     public double wallWait = 1.0;
 
     private static double cPower = 1;// seconds
@@ -105,19 +105,20 @@ public class AutoControl {
     }
     public void scorePixel() throws InterruptedException {
         // Activate intake servo to release pixel
-        robot.intakeServo.setPower(-0.5);
+        robot.intakeRotatorServo.setPosition(0.5);
+        robot.intakeServoGrip.setPosition(0.3433);
+        robot.intakeSpinnerServo.setPosition(0.84);
 
         wait(SCORING_TIMEOUT);
 
-        robot.intakeServo.setPower(0);
+        robot.intakeRotatorServo.setPosition(0.2);
     }
 
     public void collectFromSpikeMark(double sampleX) throws InterruptedException {
 
         // Move arm to collecting position
-        robot.armTarget = ARM_COLLECTING;
+        robot.armTarget = -200;
         robot.extTarget = -0;
-        robot.intakeServo.setPower(0.5);
 
         // Navigate to sample position
         moveTo(Math.max(sampleX * 0.8, 500),SAMPLES_Y + 250,SAMPLE_HEADING, power, NAVIGATION_TIMEOUT, cPower);
@@ -125,11 +126,10 @@ public class AutoControl {
         // Activate intake to collect pixel
 
         moveTo(Math.max(sampleX * 0.8, 500), SAMPLES_Y, SAMPLE_HEADING, power, NAVIGATION_TIMEOUT, cPower);
+        robot.armTarget = 0;
         moveTo(sampleX, SAMPLES_Y, SAMPLE_HEADING, power, NAVIGATION_TIMEOUT, cPower);
-
+        robot.intakeServoGrip.setPosition(0.15);
         wait(COLLECTION_TIMEOUT);
-
-        robot.intakeServo.setPower(0);
     }
 
 
