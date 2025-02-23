@@ -124,6 +124,7 @@ public class AutoControl {
         moveTo(Math.max(sampleX * 0.8, 500),SAMPLES_Y + 250,SAMPLE_HEADING, power, NAVIGATION_TIMEOUT, cPower);
 
         // Activate intake to collect pixel
+        robot.intakeRotatorServo.setPosition(0.6);
 
         moveTo(Math.max(sampleX * 0.8, 500), SAMPLES_Y, SAMPLE_HEADING, power, NAVIGATION_TIMEOUT, cPower);
         robot.armTarget = 0;
