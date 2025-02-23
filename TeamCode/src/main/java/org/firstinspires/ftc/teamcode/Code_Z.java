@@ -31,6 +31,7 @@ public class Code_Z extends LinearOpMode {
     private double navH = 0;// Degrees
     private boolean isEditing = false;
     private boolean nearBasket = false;
+    private boolean isDown = false;
     double basketXError = BASKET_X;
     double basketYError = BASKET_Y;
     double basketHError = BASKET_HEADING;
@@ -130,6 +131,7 @@ public class Code_Z extends LinearOpMode {
             if (gamepad1.dpad_up) {
                 robot.armTarget = robot.ARM_HIGH;
                 robot.extTarget = robot.MAX_EXTENSION;
+                robot.intakeRotatorServo.setPosition(0.5);
             }
 
             if (gamepad1.dpad_down) {
@@ -156,14 +158,21 @@ public class Code_Z extends LinearOpMode {
                 robot.armControl(0, 1);
             }
 
-            int upper_limit = robot.extensionMotor.getCurrentPosition() < -1500 ? -1000 : -700;
-            double xi = robot.armTarget > upper_limit && robot.armTarget < -100 ? 0.6 :0.28;
-            robot.myOpMode.telemetry.addData("xi", xi);
-            robot.intakeRotatorServo.setPosition(xi);
+            if (isDown && robot.armMotor.getCurrentPosition() > -2000){
+                int upper_limit = robot.extensionMotor.getCurrentPosition() < -1500 ? -1200 : -1000;
+                double xi = robot.armTarget > upper_limit && robot.armTarget < -100 ? 0.6 :0.28;
+                robot.myOpMode.telemetry.addData("xi", xi);
+                robot.intakeRotatorServo.setPosition(xi);
+            }
+
+            if(gamepad1.left_stick_button){
+                isDown = !isDown;
+            }
 
             // Intake control
             if (gamepad1.right_trigger > 0) {
-                robot.intakeServoGrip.setPosition(0.15); // gripper abs open position
+                robot.intakeServoGrip.setPosition(0.15);
+                // gripper abs open position
 
             } else if (gamepad1.left_trigger > 0) {
                 robot.intakeServoGrip.setPosition(0.3433); // gripper abs closed position
@@ -215,6 +224,7 @@ public class Code_Z extends LinearOpMode {
             telemetry.addData("near basker", odo.getPosition().getHeading(AngleUnit.DEGREES));
             telemetry.addData("editing", odo.getHeading());
             telemetry.addData("basket h errpr", basketHError);
+            telemetry.addData("sfrf", isDown);
             if (isNavigating) {
                 telemetry.addData("Navigation", "Moving to Basket");
             }
